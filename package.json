@@ -1,0 +1,51 @@
+{
+	"name": "zed-claude-code",
+	"version": "1.0.0",
+	"description": "Multi-protocol bridge server enabling seamless integration between Claude AI and external applications through Agent Client Protocol and Model Context Protocol",
+	"main": "dist/cli.cjs",
+	"bin": {
+		"zed-claude-code": "dist/cli.cjs"
+	},
+	"type": "module",
+	"scripts": {
+		"build": "node --import @swc-node/register/esm-register esbuild.config.mts",
+		"build:prod": "NODE_ENV=production npm run build",
+		"dev": "npm run build --watch",
+		"start": "node dist/cli.cjs",
+		"test": "vitest run",
+		"test:watch": "vitest --watch",
+		"lint": "biome check .",
+		"format": "biome check --fix --unsafe .",
+		"typecheck": "tsc --noEmit",
+		"clean": "rm -rf dist"
+	},
+	"keywords": [
+		"claude",
+		"agent",
+		"zed",
+		"typescript",
+		"streaming",
+		"json-rpc",
+		"proxy"
+	],
+	"author": "",
+	"license": "MIT",
+	"dependencies": {
+		"@anthropic-ai/claude-code": "^1.0.98",
+		"@modelcontextprotocol/sdk": "^1.17.4",
+		"@zed-industries/agent-client-protocol": "^0.1.2",
+		"builtin-modules": "^5.0.0",
+		"uuid": "^11.1.0",
+		"zod": "^3.25.76"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^2.2.2",
+		"@swc-node/register": "^1.11.1",
+		"@swc/core": "^1.13.5",
+		"@types/node": "^24.3.0",
+		"@types/uuid": "^10.0.0",
+		"esbuild": "^0.25.9",
+		"typescript": "^5.9.2",
+		"vitest": "^3.2.4"
+	}
+}

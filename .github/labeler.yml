@@ -1,0 +1,51 @@
+# Documentation changes
+documentation:
+  - changed-files:
+    - any-glob-to-any-file:
+      - '**/*.md'
+
+# Source code changes
+source:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'src/**'
+
+# Test changes
+tests:
+  - changed-files:
+    - any-glob-to-any-file:
+      - '**/*.test.*'
+      - 'vitest.config.ts'
+
+# Configuration changes
+config:
+  - changed-files:
+    - any-glob-to-any-file:
+      - '*.json'
+      - '*.yaml'
+      - '.github/workflows/**'
+
+# Dependencies
+dependencies:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'package.json'
+      - 'package-lock.json'
+
+# CI/CD changes
+ci/cd:
+  - changed-files:
+    - any-glob-to-any-file:
+      - '.github/**'
+      - '.editorconfig'
+      - 'biome.json'
+      - 'vitest.config.ts'
+
+# Build/tooling changes
+build:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'esbuild.config.mts'
+      - '.editorconfig'
+      - 'biome.json'
+      - 'tsconfig.json'
