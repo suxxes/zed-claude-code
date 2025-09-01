@@ -13,11 +13,9 @@ vi.mock('../utils/logger', () => ({
 
 describe('SearchToolsHandler', () => {
 	let handler: SearchToolsHandler;
-	let cachedFileContent: Map<string, string>;
 
 	beforeEach(() => {
 		handler = new SearchToolsHandler();
-		cachedFileContent = new Map();
 	});
 
 	afterEach(() => {
@@ -36,7 +34,7 @@ describe('SearchToolsHandler', () => {
 					},
 				};
 
-				const result = handler.getToolInfo(toolUse, cachedFileContent);
+				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
 					title: 'Find /project/src **/*.ts',
@@ -55,7 +53,7 @@ describe('SearchToolsHandler', () => {
 					},
 				};
 
-				const result = handler.getToolInfo(toolUse, cachedFileContent);
+				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
 					title: 'Find *.js',
@@ -75,7 +73,7 @@ describe('SearchToolsHandler', () => {
 					},
 				};
 
-				const result = handler.getToolInfo(toolUse, cachedFileContent);
+				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
 					title: 'Find /project/test',
@@ -94,7 +92,7 @@ describe('SearchToolsHandler', () => {
 					},
 				};
 
-				const result = handler.getToolInfo(toolUse, cachedFileContent);
+				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
 					title: 'Find',
@@ -114,7 +112,7 @@ describe('SearchToolsHandler', () => {
 					},
 				};
 
-				const result = handler.getToolInfo(toolUse, cachedFileContent);
+				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
 					title: 'Find /workspace src/**/*.{ts,tsx,js,jsx}',
@@ -135,7 +133,7 @@ describe('SearchToolsHandler', () => {
 					},
 				};
 
-				const result = handler.getToolInfo(toolUse, cachedFileContent);
+				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
 					title: 'grep "function"',
@@ -154,7 +152,7 @@ describe('SearchToolsHandler', () => {
 					},
 				};
 
-				const result = handler.getToolInfo(toolUse, cachedFileContent);
+				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
 					title: 'grep "TODO" /project/src',
@@ -173,7 +171,7 @@ describe('SearchToolsHandler', () => {
 					},
 				};
 
-				const result = handler.getToolInfo(toolUse, cachedFileContent);
+				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
 					title: 'grep -i "Error"',
@@ -193,7 +191,7 @@ describe('SearchToolsHandler', () => {
 					},
 				};
 
-				const result = handler.getToolInfo(toolUse, cachedFileContent);
+				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
 					title: 'grep -n "export" /src',
@@ -214,7 +212,7 @@ describe('SearchToolsHandler', () => {
 					},
 				};
 
-				const result = handler.getToolInfo(toolUse, cachedFileContent);
+				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
 					title: 'grep -A 3 -B 2 -C 1 "error"',
@@ -233,7 +231,7 @@ describe('SearchToolsHandler', () => {
 					},
 				};
 
-				const result = handler.getToolInfo(toolUse, cachedFileContent);
+				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
 					title: 'grep -l "import"',
@@ -252,7 +250,7 @@ describe('SearchToolsHandler', () => {
 					},
 				};
 
-				const result = handler.getToolInfo(toolUse, cachedFileContent);
+				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
 					title: 'grep -c "test"',
@@ -271,7 +269,7 @@ describe('SearchToolsHandler', () => {
 					},
 				};
 
-				const result = handler.getToolInfo(toolUse, cachedFileContent);
+				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
 					title: 'grep "class"',
@@ -290,7 +288,7 @@ describe('SearchToolsHandler', () => {
 					},
 				};
 
-				const result = handler.getToolInfo(toolUse, cachedFileContent);
+				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
 					title: 'grep | head -10 "const"',
@@ -309,7 +307,7 @@ describe('SearchToolsHandler', () => {
 					},
 				};
 
-				const result = handler.getToolInfo(toolUse, cachedFileContent);
+				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
 					title: 'grep --include="*.ts" "interface"',
@@ -328,7 +326,7 @@ describe('SearchToolsHandler', () => {
 					},
 				};
 
-				const result = handler.getToolInfo(toolUse, cachedFileContent);
+				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
 					title: 'grep --type=js "function"',
@@ -347,7 +345,7 @@ describe('SearchToolsHandler', () => {
 					},
 				};
 
-				const result = handler.getToolInfo(toolUse, cachedFileContent);
+				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
 					title: 'grep -P "function.*{.*}"',
@@ -375,7 +373,7 @@ describe('SearchToolsHandler', () => {
 					},
 				};
 
-				const result = handler.getToolInfo(toolUse, cachedFileContent);
+				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
 					title: 'grep -i -n -A 2 -B 1 | head -20 --include="*.{ts,js}" --type=js -P "error" /project',
@@ -396,7 +394,7 @@ describe('SearchToolsHandler', () => {
 					},
 				};
 
-				const result = handler.getToolInfo(toolUse, cachedFileContent);
+				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
 					title: 'grep -A 0 -B 0 -C 0 "test"',
@@ -416,7 +414,7 @@ describe('SearchToolsHandler', () => {
 					},
 				};
 
-				const result = handler.getToolInfo(toolUse, cachedFileContent);
+				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
 					title: "List the `/project/src/components` directory's contents",
@@ -433,7 +431,7 @@ describe('SearchToolsHandler', () => {
 					input: {},
 				};
 
-				const result = handler.getToolInfo(toolUse, cachedFileContent);
+				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
 					title: "List the current directory's contents",
@@ -452,7 +450,7 @@ describe('SearchToolsHandler', () => {
 					},
 				};
 
-				const result = handler.getToolInfo(toolUse, cachedFileContent);
+				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
 					title: "List the current directory's contents",
@@ -471,7 +469,7 @@ describe('SearchToolsHandler', () => {
 					},
 				};
 
-				const result = handler.getToolInfo(toolUse, cachedFileContent);
+				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
 					title: "List the current directory's contents",
@@ -490,7 +488,7 @@ describe('SearchToolsHandler', () => {
 					},
 				};
 
-				const result = handler.getToolInfo(toolUse, cachedFileContent);
+				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
 					title: "List the `/home/user/projects/my-app/src/utils` directory's contents",
@@ -508,7 +506,7 @@ describe('SearchToolsHandler', () => {
 				input: {},
 			};
 
-			expect(() => handler.getToolInfo(toolUse, cachedFileContent)).toThrow('Unsupported tool: UnsupportedSearchTool');
+			expect(() => handler.getToolInfo(toolUse)).toThrow('Unsupported tool: UnsupportedSearchTool');
 		});
 	});
 
@@ -873,7 +871,7 @@ describe('SearchToolsHandler', () => {
 				},
 			};
 
-			const toolInfo = handler.getToolInfo(toolUse, cachedFileContent);
+			const toolInfo = handler.getToolInfo(toolUse);
 			expect(toolInfo.title).toBe('Find /project/src **/*.test.ts');
 			expect(toolInfo.kind).toBe('search');
 
@@ -903,7 +901,7 @@ describe('SearchToolsHandler', () => {
 				},
 			};
 
-			const toolInfo = handler.getToolInfo(toolUse, cachedFileContent);
+			const toolInfo = handler.getToolInfo(toolUse);
 			expect(toolInfo.title).toBe('grep -n -A 2 --include="*.ts" "async function" /src');
 			expect(toolInfo.kind).toBe('search');
 
@@ -930,7 +928,7 @@ describe('SearchToolsHandler', () => {
 				},
 			};
 
-			const toolInfo = handler.getToolInfo(toolUse, cachedFileContent);
+			const toolInfo = handler.getToolInfo(toolUse);
 			expect(toolInfo.title).toBe("List the `/project/src/components` directory's contents");
 			expect(toolInfo.kind).toBe('search');
 
@@ -966,7 +964,7 @@ describe('SearchToolsHandler', () => {
 				},
 			};
 
-			const result = handler.getToolInfo(toolUse, cachedFileContent);
+			const result = handler.getToolInfo(toolUse);
 
 			expect(result.title).toBe('grep -B null "test"');
 			expect(result.kind).toBe('search');
@@ -982,7 +980,7 @@ describe('SearchToolsHandler', () => {
 				},
 			};
 
-			const result = handler.getToolInfo(toolUse, cachedFileContent);
+			const result = handler.getToolInfo(toolUse);
 
 			expect(result.title).toBe('grep -P "function.*\\{.*\\}"');
 		});
@@ -997,7 +995,7 @@ describe('SearchToolsHandler', () => {
 				},
 			};
 
-			const result = handler.getToolInfo(toolUse, cachedFileContent);
+			const result = handler.getToolInfo(toolUse);
 
 			expect(result.title).toBe('Find');
 			expect(result.locations).toEqual([]);

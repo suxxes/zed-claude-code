@@ -1,6 +1,5 @@
 import type { SDKAssistantMessage, SDKUserMessage } from '@anthropic-ai/claude-code';
 import type { SessionNotification } from '@zed-industries/agent-client-protocol';
-import type { CacheManager } from '../managers/cache-manager';
 import type { ClaudePlanEntry, ToolsManager } from '../managers/tools-manager';
 import { Logger } from '../utils/logger';
 import type { MessageTransformer } from './message-transformer';
@@ -15,7 +14,6 @@ export class ClaudeToAcpTransformer
 				message: SDKAssistantMessage | SDKUserMessage;
 				sessionId: string;
 				toolsManager: ToolsManager;
-				cacheManager: CacheManager;
 			},
 			SessionNotification[]
 		>
@@ -30,12 +28,10 @@ export class ClaudeToAcpTransformer
 		message,
 		sessionId,
 		toolsManager,
-		cacheManager,
 	}: {
 		message: SDKAssistantMessage | SDKUserMessage;
 		sessionId: string;
 		toolsManager: ToolsManager;
-		cacheManager: CacheManager;
 	}): SessionNotification[] {
 		const chunks = message.message.content as ContentChunk[];
 		const output = [];
@@ -83,10 +79,10 @@ export class ClaudeToAcpTransformer
 				case 'tool_use':
 					this.logger.info(`Tool use detected: ${chunk.name} (${chunk.id})`);
 					this.logger.info(`Tool input: ${JSON.stringify(chunk.input)}`);
+
 					// Cache tool use for later reference in tool_result handling
 					this.logger.info(`Caching tool use: ${chunk.name} (${chunk.id})`);
-
-					cacheManager.setToolUse(chunk.id, chunk);
+					toolsManager.setToolUse(chunk.id, chunk);
 
 					if (chunk.name === 'TodoWrite') {
 						this.logger.info(`Processing TodoWrite tool use`);
@@ -98,7 +94,7 @@ export class ClaudeToAcpTransformer
 					} else {
 						this.logger.info(`Getting tool info for: ${chunk.name} (${chunk.id})`);
 
-						const toolInfo = toolsManager.getToolInfoFromToolUse(chunk, cacheManager.getAllFileContents());
+						const toolInfo = toolsManager.getToolInfoFromToolUse(chunk);
 
 						this.logger.info(`Tool info result: ${JSON.stringify(toolInfo)}`);
 
@@ -121,7 +117,7 @@ export class ClaudeToAcpTransformer
 
 					this.logger.info(`Processing tool result for: ${chunk.tool_use_id}`);
 
-					const cachedToolUse = cacheManager.getToolUse(chunk.tool_use_id);
+					const cachedToolUse = toolsManager.getToolUse(chunk.tool_use_id);
 
 					this.logger.info(`Cached tool use: ${cachedToolUse ? cachedToolUse.name : 'not found'}`);
 

@@ -13,11 +13,9 @@ vi.mock('../utils/logger', () => ({
 
 describe('ExecutionToolsHandler', () => {
 	let handler: ExecutionToolsHandler;
-	let cachedFileContent: Map<string, string>;
 
 	beforeEach(() => {
 		handler = new ExecutionToolsHandler();
-		cachedFileContent = new Map();
 	});
 
 	afterEach(() => {
@@ -36,7 +34,7 @@ describe('ExecutionToolsHandler', () => {
 					},
 				};
 
-				const result = handler.getToolInfo(toolUse, cachedFileContent);
+				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
 					title: '`ls -la`',
@@ -59,7 +57,7 @@ describe('ExecutionToolsHandler', () => {
 					},
 				};
 
-				const result = handler.getToolInfo(toolUse, cachedFileContent);
+				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
 					title: '`npm install`',
@@ -78,7 +76,7 @@ describe('ExecutionToolsHandler', () => {
 					},
 				};
 
-				const result = handler.getToolInfo(toolUse, cachedFileContent);
+				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
 					title: 'Terminal',
@@ -101,7 +99,7 @@ describe('ExecutionToolsHandler', () => {
 					},
 				};
 
-				const result = handler.getToolInfo(toolUse, cachedFileContent);
+				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
 					title: '`echo \\`date\\``',
@@ -119,7 +117,7 @@ describe('ExecutionToolsHandler', () => {
 					},
 				};
 
-				const result = handler.getToolInfo(toolUse, cachedFileContent);
+				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
 					title: '`echo \\`pwd\\` && ls \\`dirname $0\\``',
@@ -138,7 +136,7 @@ describe('ExecutionToolsHandler', () => {
 					} as any,
 				};
 
-				const result = handler.getToolInfo(toolUse, cachedFileContent);
+				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
 					title: 'Terminal',
@@ -156,7 +154,7 @@ describe('ExecutionToolsHandler', () => {
 					input: {},
 				};
 
-				const result = handler.getToolInfo(toolUse, cachedFileContent);
+				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
 					title: 'Tail Logs',
@@ -172,7 +170,7 @@ describe('ExecutionToolsHandler', () => {
 					input: {} as BashOutputInput,
 				};
 
-				const result = handler.getToolInfo(toolUse, cachedFileContent);
+				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
 					title: 'Tail Logs',
@@ -190,7 +188,7 @@ describe('ExecutionToolsHandler', () => {
 					input: {},
 				};
 
-				const result = handler.getToolInfo(toolUse, cachedFileContent);
+				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
 					title: 'Kill Process',
@@ -206,7 +204,7 @@ describe('ExecutionToolsHandler', () => {
 					input: {} as KillBashInput,
 				};
 
-				const result = handler.getToolInfo(toolUse, cachedFileContent);
+				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
 					title: 'Kill Process',
@@ -227,7 +225,7 @@ describe('ExecutionToolsHandler', () => {
 					},
 				};
 
-				const result = handler.getToolInfo(toolUse, cachedFileContent);
+				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
 					title: 'Analyze code quality',
@@ -250,7 +248,7 @@ describe('ExecutionToolsHandler', () => {
 					},
 				};
 
-				const result = handler.getToolInfo(toolUse, cachedFileContent);
+				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
 					title: 'Simple task',
@@ -268,7 +266,7 @@ describe('ExecutionToolsHandler', () => {
 					},
 				};
 
-				const result = handler.getToolInfo(toolUse, cachedFileContent);
+				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
 					title: 'Task',
@@ -289,7 +287,7 @@ describe('ExecutionToolsHandler', () => {
 					input: {},
 				};
 
-				const result = handler.getToolInfo(toolUse, cachedFileContent);
+				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
 					title: 'Task',
@@ -308,7 +306,7 @@ describe('ExecutionToolsHandler', () => {
 					},
 				};
 
-				const result = handler.getToolInfo(toolUse, cachedFileContent);
+				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
 					title: 'Task',
@@ -325,9 +323,7 @@ describe('ExecutionToolsHandler', () => {
 				input: {},
 			};
 
-			expect(() => handler.getToolInfo(toolUse, cachedFileContent)).toThrow(
-				'Unsupported tool: UnsupportedExecutionTool',
-			);
+			expect(() => handler.getToolInfo(toolUse)).toThrow('Unsupported tool: UnsupportedExecutionTool');
 		});
 	});
 
@@ -625,7 +621,7 @@ describe('ExecutionToolsHandler', () => {
 				},
 			};
 
-			const toolInfo = handler.getToolInfo(toolUse, cachedFileContent);
+			const toolInfo = handler.getToolInfo(toolUse);
 			expect(toolInfo.title).toBe('`npm test`');
 			expect(toolInfo.kind).toBe('execute');
 
@@ -653,7 +649,7 @@ describe('ExecutionToolsHandler', () => {
 				},
 			};
 
-			const toolInfo = handler.getToolInfo(toolUse, cachedFileContent);
+			const toolInfo = handler.getToolInfo(toolUse);
 			expect(toolInfo.title).toBe('Security audit');
 			expect(toolInfo.kind).toBe('think');
 

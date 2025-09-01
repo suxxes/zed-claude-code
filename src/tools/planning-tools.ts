@@ -32,7 +32,7 @@ export type PlanningToolUse = {
  * Planning operations tool handler - handles TodoWrite and ExitPlanMode operations
  */
 export class PlanningToolsHandler implements ToolHandler {
-	getToolInfo(toolUse: PlanningToolUse, _cachedFileContent: Map<string, string>): ToolInfo {
+	getToolInfo(toolUse: PlanningToolUse): ToolInfo {
 		const name = toolUse.name;
 		const input = toolUse.input;
 

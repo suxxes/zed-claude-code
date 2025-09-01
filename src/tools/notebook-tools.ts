@@ -20,7 +20,7 @@ export type NotebookToolUse = {
  * Jupyter Notebook operations tool handler - handles NotebookRead and NotebookEdit
  */
 export class NotebookToolsHandler implements ToolHandler {
-	getToolInfo(toolUse: NotebookToolUse, _cachedFileContent: Map<string, string>): ToolInfo {
+	getToolInfo(toolUse: NotebookToolUse): ToolInfo {
 		const name = toolUse.name;
 		const input = toolUse.input;
 

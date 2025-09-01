@@ -96,7 +96,7 @@ export interface ToolHandler {
 	/**
 	 * Generate tool info for ACP client UI
 	 */
-	getToolInfo(toolUse: AnyToolUse, cachedFileContent: Map<string, string>): ToolInfo;
+	getToolInfo(toolUse: AnyToolUse): ToolInfo;
 
 	/**
 	 * Process tool result and generate update info
@@ -117,6 +117,9 @@ export class ToolsManager {
 	protected genericTools: GenericToolsHandler;
 	protected logger: Logger;
 
+	/** Cache of tool use instances for tracking tool execution state */
+	protected toolUseCache = new Map<string, AnyToolUse>();
+
 	constructor() {
 		this.fileTools = new FileToolsHandler();
 		this.searchTools = new SearchToolsHandler();
@@ -131,39 +134,39 @@ export class ToolsManager {
 	/**
 	 * Get tool info from tool use by routing to appropriate handler
 	 */
-	getToolInfoFromToolUse(toolUse: AnyToolUse, cachedFileContent: Map<string, string>): ToolInfo {
+	getToolInfoFromToolUse(toolUse: AnyToolUse): ToolInfo {
 		this.logger.debug(`Getting tool info for: ${toolUse.name} (${toolUse.id})`);
 
 		try {
 			// Route to appropriate handler based on tool type
 			if (this.isFileOperation(toolUse)) {
 				this.logger.debug(`Routing ${toolUse.name} to file tools handler`);
-				return this.fileTools.getToolInfo(toolUse, cachedFileContent);
+				return this.fileTools.getToolInfo(toolUse);
 			} else if (this.isSearchOperation(toolUse)) {
 				this.logger.debug(`Routing ${toolUse.name} to search tools handler`);
-				return this.searchTools.getToolInfo(toolUse, cachedFileContent);
+				return this.searchTools.getToolInfo(toolUse);
 			} else if (this.isExecutionOperation(toolUse)) {
 				this.logger.debug(`Routing ${toolUse.name} to execution tools handler`);
-				return this.executionTools.getToolInfo(toolUse, cachedFileContent);
+				return this.executionTools.getToolInfo(toolUse);
 			} else if (this.isNotebookOperation(toolUse)) {
 				this.logger.debug(`Routing ${toolUse.name} to notebook tools handler`);
-				return this.notebookTools.getToolInfo(toolUse, cachedFileContent);
+				return this.notebookTools.getToolInfo(toolUse);
 			} else if (this.isWebOperation(toolUse)) {
 				this.logger.debug(`Routing ${toolUse.name} to web tools handler`);
-				return this.webTools.getToolInfo(toolUse, cachedFileContent);
+				return this.webTools.getToolInfo(toolUse);
 			} else if (this.isPlanningOperation(toolUse)) {
 				this.logger.debug(`Routing ${toolUse.name} to planning tools handler`);
-				return this.planningTools.getToolInfo(toolUse, cachedFileContent);
+				return this.planningTools.getToolInfo(toolUse);
 			} else {
 				this.logger.debug(`Routing ${toolUse.name} to generic tools handler`);
-				return this.genericTools.getToolInfo(toolUse as GenericToolUse, cachedFileContent);
+				return this.genericTools.getToolInfo(toolUse as GenericToolUse);
 			}
 		} catch (error) {
 			this.logger.warn(
 				`Specialized handler failed for ${toolUse.name}, falling back to generic: ${error instanceof Error ? error.message : String(error)}`,
 			);
 			// Fallback to generic handler if specialized handler fails
-			return this.genericTools.getToolInfo(toolUse as GenericToolUse, cachedFileContent);
+			return this.genericTools.getToolInfo(toolUse as GenericToolUse);
 		}
 	}
 
@@ -216,6 +219,21 @@ export class ToolsManager {
 	 */
 	convertPlanEntries(input: { todos: ClaudePlanEntry[] }): PlanEntry[] {
 		return this.planningTools.convertPlanEntries(input);
+	}
+
+	/**
+	 * Store tool use data for later correlation
+	 */
+	setToolUse(toolUseId: string, toolUse: AnyToolUse): void {
+		this.toolUseCache.set(toolUseId, toolUse);
+		this.logger.debug(`Cached tool use: ${toolUseId}`);
+	}
+
+	/**
+	 * Retrieve tool use data
+	 */
+	getToolUse(toolUseId: string): AnyToolUse | undefined {
+		return this.toolUseCache.get(toolUseId);
 	}
 
 	/**

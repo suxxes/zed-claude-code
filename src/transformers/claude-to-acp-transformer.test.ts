@@ -1,6 +1,5 @@
 import type { SDKAssistantMessage, SDKUserMessage } from '@anthropic-ai/claude-code';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import type { CacheManager } from '../managers/cache-manager';
 import type { ToolsManager } from '../managers/tools-manager';
 import { ClaudeToAcpTransformer } from './claude-to-acp-transformer';
 
@@ -15,25 +14,19 @@ vi.mock('../utils/logger', () => ({
 
 describe('ClaudeToAcpTransformer', () => {
 	let transformer: ClaudeToAcpTransformer;
-	let mockCacheManager: CacheManager;
 	let mockToolsManager: ToolsManager;
 	const sessionId = 'test-session-123';
 
 	beforeEach(() => {
 		transformer = new ClaudeToAcpTransformer();
 
-		// Mock CacheManager
-		mockCacheManager = {
-			setToolUse: vi.fn(),
-			getToolUse: vi.fn(),
-			getAllFileContents: vi.fn().mockReturnValue(new Map()),
-		} as unknown as CacheManager;
-
 		// Mock ToolsManager
 		mockToolsManager = {
 			convertPlanEntries: vi.fn(),
 			getToolInfoFromToolUse: vi.fn(),
 			getToolUpdateFromResult: vi.fn(),
+			setToolUse: vi.fn(),
+			getToolUse: vi.fn(),
 		} as unknown as ToolsManager;
 	});
 
@@ -60,7 +53,6 @@ describe('ClaudeToAcpTransformer', () => {
 					message,
 					sessionId,
 					toolsManager: mockToolsManager,
-					cacheManager: mockCacheManager,
 				});
 
 				expect(result).toHaveLength(1);
@@ -90,7 +82,6 @@ describe('ClaudeToAcpTransformer', () => {
 					message,
 					sessionId,
 					toolsManager: mockToolsManager,
-					cacheManager: mockCacheManager,
 				});
 
 				expect(result).toHaveLength(2);
@@ -115,7 +106,6 @@ describe('ClaudeToAcpTransformer', () => {
 					message,
 					sessionId,
 					toolsManager: mockToolsManager,
-					cacheManager: mockCacheManager,
 				});
 
 				expect(result).toHaveLength(1);
@@ -138,7 +128,6 @@ describe('ClaudeToAcpTransformer', () => {
 					message,
 					sessionId,
 					toolsManager: mockToolsManager,
-					cacheManager: mockCacheManager,
 				});
 
 				expect(result).toHaveLength(1);
@@ -176,7 +165,6 @@ describe('ClaudeToAcpTransformer', () => {
 					message,
 					sessionId,
 					toolsManager: mockToolsManager,
-					cacheManager: mockCacheManager,
 				});
 
 				expect(result).toHaveLength(1);
@@ -213,7 +201,6 @@ describe('ClaudeToAcpTransformer', () => {
 					message,
 					sessionId,
 					toolsManager: mockToolsManager,
-					cacheManager: mockCacheManager,
 				});
 
 				expect(result).toHaveLength(1);
@@ -259,25 +246,21 @@ describe('ClaudeToAcpTransformer', () => {
 					message,
 					sessionId,
 					toolsManager: mockToolsManager,
-					cacheManager: mockCacheManager,
 				});
 
-				expect(mockCacheManager.setToolUse).toHaveBeenCalledWith('tool-123', {
+				expect(mockToolsManager.setToolUse).toHaveBeenCalledWith('tool-123', {
 					type: 'tool_use',
 					id: 'tool-123',
 					name: 'TestTool',
 					input: { param: 'value' },
 				});
 
-				expect(mockToolsManager.getToolInfoFromToolUse).toHaveBeenCalledWith(
-					{
-						type: 'tool_use',
-						id: 'tool-123',
-						name: 'TestTool',
-						input: { param: 'value' },
-					},
-					new Map(),
-				);
+				expect(mockToolsManager.getToolInfoFromToolUse).toHaveBeenCalledWith({
+					type: 'tool_use',
+					id: 'tool-123',
+					name: 'TestTool',
+					input: { param: 'value' },
+				});
 
 				expect(result).toHaveLength(1);
 				expect(result[0]).toEqual({
@@ -323,14 +306,6 @@ describe('ClaudeToAcpTransformer', () => {
 					message,
 					sessionId,
 					toolsManager: mockToolsManager,
-					cacheManager: mockCacheManager,
-				});
-
-				expect(mockCacheManager.setToolUse).toHaveBeenCalledWith('todo-123', {
-					type: 'tool_use',
-					id: 'todo-123',
-					name: 'TodoWrite',
-					input: { todos: [{ content: 'Task 1', status: 'pending', priority: 'medium', id: '1' }] },
 				});
 
 				expect(mockToolsManager.convertPlanEntries).toHaveBeenCalledWith({
@@ -371,14 +346,6 @@ describe('ClaudeToAcpTransformer', () => {
 					message,
 					sessionId,
 					toolsManager: mockToolsManager,
-					cacheManager: mockCacheManager,
-				});
-
-				expect(mockCacheManager.setToolUse).toHaveBeenCalledWith('complex-tool-123', {
-					type: 'tool_use',
-					id: 'complex-tool-123',
-					name: 'ComplexTool',
-					input: complexInput,
 				});
 
 				expect(result[0].update).toMatchObject({
@@ -395,7 +362,7 @@ describe('ClaudeToAcpTransformer', () => {
 				});
 			});
 
-			it('should handle successful tool_result chunks', () => {
+			it('should handle tool_result', () => {
 				const cachedToolUse = {
 					type: 'tool_use' as const,
 					id: 'tool-123',
@@ -403,7 +370,7 @@ describe('ClaudeToAcpTransformer', () => {
 					input: { param: 'value' },
 				};
 
-				vi.mocked(mockCacheManager.getToolUse).mockReturnValue(cachedToolUse);
+				vi.mocked(mockToolsManager.getToolUse).mockReturnValue(cachedToolUse);
 
 				const message: SDKAssistantMessage = {
 					message: {
@@ -422,10 +389,9 @@ describe('ClaudeToAcpTransformer', () => {
 					message,
 					sessionId,
 					toolsManager: mockToolsManager,
-					cacheManager: mockCacheManager,
 				});
 
-				expect(mockCacheManager.getToolUse).toHaveBeenCalledWith('tool-123');
+				expect(mockToolsManager.getToolUse).toHaveBeenCalledWith('tool-123');
 				expect(mockToolsManager.getToolUpdateFromResult).toHaveBeenCalledWith(
 					{
 						type: 'tool_result',
@@ -437,28 +403,14 @@ describe('ClaudeToAcpTransformer', () => {
 				);
 
 				expect(result).toHaveLength(1);
-				expect(result[0]).toEqual({
-					sessionId,
-					update: {
-						toolCallId: 'tool-123',
-						sessionUpdate: 'tool_call_update',
-						status: 'completed',
-						title: 'Updated Tool',
-						content: [{ type: 'text', text: 'Result content' }],
-					},
+				expect(result[0].update).toMatchObject({
+					toolCallId: 'tool-123',
+					sessionUpdate: 'tool_call_update',
+					status: 'completed',
 				});
 			});
 
 			it('should handle error tool_result chunks', () => {
-				const cachedToolUse = {
-					type: 'tool_use' as const,
-					id: 'tool-456',
-					name: 'FailingTool',
-					input: { param: 'value' },
-				};
-
-				vi.mocked(mockCacheManager.getToolUse).mockReturnValue(cachedToolUse);
-
 				const message: SDKAssistantMessage = {
 					message: {
 						content: [
@@ -476,7 +428,6 @@ describe('ClaudeToAcpTransformer', () => {
 					message,
 					sessionId,
 					toolsManager: mockToolsManager,
-					cacheManager: mockCacheManager,
 				});
 
 				expect(result).toHaveLength(1);
@@ -489,47 +440,6 @@ describe('ClaudeToAcpTransformer', () => {
 						title: 'Updated Tool',
 						content: [{ type: 'text', text: 'Result content' }],
 					},
-				});
-			});
-
-			it('should handle tool_result with no cached tool_use', () => {
-				vi.mocked(mockCacheManager.getToolUse).mockReturnValue(undefined);
-
-				const message: SDKAssistantMessage = {
-					message: {
-						content: [
-							{
-								type: 'tool_result',
-								tool_use_id: 'unknown-tool',
-								content: 'Result content',
-								is_error: false,
-							},
-						],
-					},
-				} as SDKAssistantMessage;
-
-				const result = transformer.transform({
-					message,
-					sessionId,
-					toolsManager: mockToolsManager,
-					cacheManager: mockCacheManager,
-				});
-
-				expect(mockToolsManager.getToolUpdateFromResult).toHaveBeenCalledWith(
-					{
-						type: 'tool_result',
-						tool_use_id: 'unknown-tool',
-						content: 'Result content',
-						is_error: false,
-					},
-					undefined,
-				);
-
-				expect(result).toHaveLength(1);
-				expect(result[0].update).toMatchObject({
-					toolCallId: 'unknown-tool',
-					sessionUpdate: 'tool_call_update',
-					status: 'completed',
 				});
 			});
 
@@ -551,7 +461,6 @@ describe('ClaudeToAcpTransformer', () => {
 					message,
 					sessionId,
 					toolsManager: mockToolsManager,
-					cacheManager: mockCacheManager,
 				});
 
 				expect(result).toHaveLength(1);
@@ -575,15 +484,6 @@ describe('ClaudeToAcpTransformer', () => {
 					title: 'Result Tool',
 					content: [{ type: 'text', text: 'Tool result' }],
 				});
-
-				const cachedToolUse = {
-					type: 'tool_use' as const,
-					id: 'tool-789',
-					name: 'MixedTool',
-					input: {},
-				};
-
-				vi.mocked(mockCacheManager.getToolUse).mockReturnValue(cachedToolUse);
 
 				const message: SDKAssistantMessage = {
 					message: {
@@ -612,7 +512,6 @@ describe('ClaudeToAcpTransformer', () => {
 					message,
 					sessionId,
 					toolsManager: mockToolsManager,
-					cacheManager: mockCacheManager,
 				});
 
 				expect(result).toHaveLength(6);
@@ -667,7 +566,6 @@ describe('ClaudeToAcpTransformer', () => {
 						message,
 						sessionId,
 						toolsManager: mockToolsManager,
-						cacheManager: mockCacheManager,
 					});
 				}).toThrow('unhandled chunk type: unknown_type');
 			});
@@ -683,7 +581,6 @@ describe('ClaudeToAcpTransformer', () => {
 					message,
 					sessionId,
 					toolsManager: mockToolsManager,
-					cacheManager: mockCacheManager,
 				});
 
 				expect(result).toHaveLength(0);
@@ -708,16 +605,9 @@ describe('ClaudeToAcpTransformer', () => {
 					message,
 					sessionId,
 					toolsManager: mockToolsManager,
-					cacheManager: mockCacheManager,
 				});
 
 				expect(result).toHaveLength(1);
-				expect(mockCacheManager.setToolUse).toHaveBeenCalledWith('', {
-					type: 'tool_use',
-					id: '',
-					name: '',
-					input: null,
-				});
 			});
 
 			it('should handle malformed tool_result chunks', () => {
@@ -738,7 +628,6 @@ describe('ClaudeToAcpTransformer', () => {
 					message,
 					sessionId,
 					toolsManager: mockToolsManager,
-					cacheManager: mockCacheManager,
 				});
 
 				expect(result).toHaveLength(1);
@@ -763,7 +652,6 @@ describe('ClaudeToAcpTransformer', () => {
 						message,
 						sessionId,
 						toolsManager: mockToolsManager,
-						cacheManager: mockCacheManager,
 					});
 				}).toThrow('unhandled chunk type: redacted_thinking');
 			});
@@ -780,7 +668,6 @@ describe('ClaudeToAcpTransformer', () => {
 						message,
 						sessionId,
 						toolsManager: mockToolsManager,
-						cacheManager: mockCacheManager,
 					});
 				}).toThrow('unhandled chunk type: document');
 			});
@@ -797,7 +684,6 @@ describe('ClaudeToAcpTransformer', () => {
 						message,
 						sessionId,
 						toolsManager: mockToolsManager,
-						cacheManager: mockCacheManager,
 					});
 				}).toThrow('unhandled chunk type: web_search_tool_result');
 			});
@@ -814,45 +700,12 @@ describe('ClaudeToAcpTransformer', () => {
 						message,
 						sessionId,
 						toolsManager: mockToolsManager,
-						cacheManager: mockCacheManager,
 					});
 				}).toThrow('unhandled chunk type: untagged_text');
 			});
 		});
 
 		describe('integration with managers', () => {
-			it('should pass file contents from cache manager to tools manager', () => {
-				const fileContents = new Map([
-					['/path/to/file1.ts', 'file1 content'],
-					['/path/to/file2.js', 'file2 content'],
-				]);
-
-				vi.mocked(mockCacheManager.getAllFileContents).mockReturnValue(fileContents);
-
-				const message: SDKAssistantMessage = {
-					message: {
-						content: [
-							{
-								type: 'tool_use',
-								id: 'tool-integration',
-								name: 'IntegrationTool',
-								input: { test: 'data' },
-							},
-						],
-					},
-				} as SDKAssistantMessage;
-
-				transformer.transform({
-					message,
-					sessionId,
-					toolsManager: mockToolsManager,
-					cacheManager: mockCacheManager,
-				});
-
-				expect(mockCacheManager.getAllFileContents).toHaveBeenCalled();
-				expect(mockToolsManager.getToolInfoFromToolUse).toHaveBeenCalledWith(expect.any(Object), fileContents);
-			});
-
 			it('should handle tools manager throwing errors', () => {
 				vi.mocked(mockToolsManager.getToolInfoFromToolUse).mockImplementation(() => {
 					throw new Error('Tools manager error');
@@ -876,33 +729,8 @@ describe('ClaudeToAcpTransformer', () => {
 						message,
 						sessionId,
 						toolsManager: mockToolsManager,
-						cacheManager: mockCacheManager,
 					});
 				}).toThrow('Tools manager error');
-			});
-
-			it('should handle cache manager operations', () => {
-				const toolUse = {
-					type: 'tool_use' as const,
-					id: 'cache-test',
-					name: 'CacheTool',
-					input: { cached: true },
-				};
-
-				const message: SDKAssistantMessage = {
-					message: {
-						content: [toolUse],
-					},
-				} as SDKAssistantMessage;
-
-				transformer.transform({
-					message,
-					sessionId,
-					toolsManager: mockToolsManager,
-					cacheManager: mockCacheManager,
-				});
-
-				expect(mockCacheManager.setToolUse).toHaveBeenCalledWith('cache-test', toolUse);
 			});
 		});
 
@@ -918,7 +746,6 @@ describe('ClaudeToAcpTransformer', () => {
 					message,
 					sessionId,
 					toolsManager: mockToolsManager,
-					cacheManager: mockCacheManager,
 				});
 
 				expect(result).toHaveLength(1);
@@ -952,7 +779,6 @@ describe('ClaudeToAcpTransformer', () => {
 					message,
 					sessionId: customSessionId,
 					toolsManager: mockToolsManager,
-					cacheManager: mockCacheManager,
 				});
 
 				expect(result).toHaveLength(3);

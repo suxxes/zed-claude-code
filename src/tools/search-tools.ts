@@ -35,7 +35,7 @@ export type SearchToolUse = {
  * Search operations tool handler - handles Glob, Grep, and LS operations
  */
 export class SearchToolsHandler implements ToolHandler {
-	getToolInfo(toolUse: SearchToolUse, _cachedFileContent: Map<string, string>): ToolInfo {
+	getToolInfo(toolUse: SearchToolUse): ToolInfo {
 		const name = toolUse.name;
 		const input = toolUse.input;
 

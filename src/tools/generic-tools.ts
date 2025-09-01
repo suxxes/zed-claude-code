@@ -10,7 +10,7 @@ export type GenericToolUse = {
  * Generic tool handler for unknown or other tools
  */
 export class GenericToolsHandler implements ToolHandler {
-	getToolInfo(toolUse: GenericToolUse, _cachedFileContent: Map<string, string>): ToolInfo {
+	getToolInfo(toolUse: GenericToolUse): ToolInfo {
 		const name = toolUse.name;
 		const input = toolUse.input;
 

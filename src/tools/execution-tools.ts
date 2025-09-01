@@ -32,7 +32,7 @@ export type ExecutionToolUse = {
  * Execution operations tool handler - handles Bash, Task, and other execution tools
  */
 export class ExecutionToolsHandler implements ToolHandler {
-	getToolInfo(toolUse: ExecutionToolUse, _cachedFileContent: Map<string, string>): ToolInfo {
+	getToolInfo(toolUse: ExecutionToolUse): ToolInfo {
 		const name = toolUse.name;
 		const input = toolUse.input;
 

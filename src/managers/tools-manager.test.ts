@@ -122,8 +122,6 @@ describe('ToolsManager', () => {
 	});
 
 	describe('getToolInfoFromToolUse', () => {
-		const cachedFileContent = new Map<string, string>();
-
 		it('should route file operations to FileToolsHandler', () => {
 			const toolUse: FileToolUse = {
 				id: 'test-id',
@@ -139,9 +137,9 @@ describe('ToolsManager', () => {
 
 			mockFileTools.getToolInfo.mockReturnValue(expectedInfo);
 
-			const result = toolsManager.getToolInfoFromToolUse(toolUse, cachedFileContent);
+			const result = toolsManager.getToolInfoFromToolUse(toolUse);
 
-			expect(mockFileTools.getToolInfo).toHaveBeenCalledWith(toolUse, cachedFileContent);
+			expect(mockFileTools.getToolInfo).toHaveBeenCalledWith(toolUse);
 			expect(result).toEqual(expectedInfo);
 		});
 
@@ -172,9 +170,9 @@ describe('ToolsManager', () => {
 					input: { absPath: '/test/path' },
 				};
 
-				const result = toolsManager.getToolInfoFromToolUse(toolUse, cachedFileContent);
+				const result = toolsManager.getToolInfoFromToolUse(toolUse);
 
-				expect(mockFileTools.getToolInfo).toHaveBeenCalledWith(toolUse, cachedFileContent);
+				expect(mockFileTools.getToolInfo).toHaveBeenCalledWith(toolUse);
 				expect(result).toEqual(expectedInfo);
 			}
 
@@ -198,9 +196,9 @@ describe('ToolsManager', () => {
 					input: {},
 				};
 
-				const result = toolsManager.getToolInfoFromToolUse(toolUse, cachedFileContent);
+				const result = toolsManager.getToolInfoFromToolUse(toolUse);
 
-				expect(mockSearchTools.getToolInfo).toHaveBeenCalledWith(toolUse, cachedFileContent);
+				expect(mockSearchTools.getToolInfo).toHaveBeenCalledWith(toolUse);
 				expect(result).toEqual(expectedInfo);
 			}
 
@@ -224,9 +222,9 @@ describe('ToolsManager', () => {
 					input: {},
 				};
 
-				const result = toolsManager.getToolInfoFromToolUse(toolUse, cachedFileContent);
+				const result = toolsManager.getToolInfoFromToolUse(toolUse);
 
-				expect(mockExecutionTools.getToolInfo).toHaveBeenCalledWith(toolUse, cachedFileContent);
+				expect(mockExecutionTools.getToolInfo).toHaveBeenCalledWith(toolUse);
 				expect(result).toEqual(expectedInfo);
 			}
 
@@ -250,9 +248,9 @@ describe('ToolsManager', () => {
 					input: {},
 				};
 
-				const result = toolsManager.getToolInfoFromToolUse(toolUse, cachedFileContent);
+				const result = toolsManager.getToolInfoFromToolUse(toolUse);
 
-				expect(mockNotebookTools.getToolInfo).toHaveBeenCalledWith(toolUse, cachedFileContent);
+				expect(mockNotebookTools.getToolInfo).toHaveBeenCalledWith(toolUse);
 				expect(result).toEqual(expectedInfo);
 			}
 
@@ -276,9 +274,9 @@ describe('ToolsManager', () => {
 					input: {},
 				};
 
-				const result = toolsManager.getToolInfoFromToolUse(toolUse, cachedFileContent);
+				const result = toolsManager.getToolInfoFromToolUse(toolUse);
 
-				expect(mockWebTools.getToolInfo).toHaveBeenCalledWith(toolUse, cachedFileContent);
+				expect(mockWebTools.getToolInfo).toHaveBeenCalledWith(toolUse);
 				expect(result).toEqual(expectedInfo);
 			}
 
@@ -302,9 +300,9 @@ describe('ToolsManager', () => {
 					input: {},
 				};
 
-				const result = toolsManager.getToolInfoFromToolUse(toolUse, cachedFileContent);
+				const result = toolsManager.getToolInfoFromToolUse(toolUse);
 
-				expect(mockPlanningTools.getToolInfo).toHaveBeenCalledWith(toolUse, cachedFileContent);
+				expect(mockPlanningTools.getToolInfo).toHaveBeenCalledWith(toolUse);
 				expect(result).toEqual(expectedInfo);
 			}
 
@@ -326,9 +324,9 @@ describe('ToolsManager', () => {
 
 			mockGenericTools.getToolInfo.mockReturnValue(expectedInfo);
 
-			const result = toolsManager.getToolInfoFromToolUse(toolUse, cachedFileContent);
+			const result = toolsManager.getToolInfoFromToolUse(toolUse);
 
-			expect(mockGenericTools.getToolInfo).toHaveBeenCalledWith(toolUse, cachedFileContent);
+			expect(mockGenericTools.getToolInfo).toHaveBeenCalledWith(toolUse);
 			expect(result).toEqual(expectedInfo);
 		});
 
@@ -351,10 +349,10 @@ describe('ToolsManager', () => {
 			});
 			mockGenericTools.getToolInfo.mockReturnValue(fallbackInfo);
 
-			const result = toolsManager.getToolInfoFromToolUse(toolUse, cachedFileContent);
+			const result = toolsManager.getToolInfoFromToolUse(toolUse);
 
-			expect(mockFileTools.getToolInfo).toHaveBeenCalledWith(toolUse, cachedFileContent);
-			expect(mockGenericTools.getToolInfo).toHaveBeenCalledWith(toolUse, cachedFileContent);
+			expect(mockFileTools.getToolInfo).toHaveBeenCalledWith(toolUse);
+			expect(mockGenericTools.getToolInfo).toHaveBeenCalledWith(toolUse);
 			expect(result).toEqual(fallbackInfo);
 		});
 
@@ -376,10 +374,10 @@ describe('ToolsManager', () => {
 			});
 			mockGenericTools.getToolInfo.mockReturnValue(fallbackInfo);
 
-			const result = toolsManager.getToolInfoFromToolUse(toolUse, cachedFileContent);
+			const result = toolsManager.getToolInfoFromToolUse(toolUse);
 
-			expect(mockFileTools.getToolInfo).toHaveBeenCalledWith(toolUse, cachedFileContent);
-			expect(mockGenericTools.getToolInfo).toHaveBeenCalledWith(toolUse, cachedFileContent);
+			expect(mockFileTools.getToolInfo).toHaveBeenCalledWith(toolUse);
+			expect(mockGenericTools.getToolInfo).toHaveBeenCalledWith(toolUse);
 			expect(result).toEqual(fallbackInfo);
 		});
 	});
@@ -967,9 +965,9 @@ describe('ToolsManager', () => {
 				content: [],
 			});
 
-			const result = toolsManager.getToolInfoFromToolUse(toolUse, new Map());
+			const result = toolsManager.getToolInfoFromToolUse(toolUse);
 
-			expect(mockGenericTools.getToolInfo).toHaveBeenCalledWith(toolUse, new Map());
+			expect(mockGenericTools.getToolInfo).toHaveBeenCalledWith(toolUse);
 			expect(result).toBeDefined();
 		});
 
@@ -986,33 +984,9 @@ describe('ToolsManager', () => {
 				content: [],
 			});
 
-			const result = toolsManager.getToolInfoFromToolUse(toolUse, new Map());
+			const result = toolsManager.getToolInfoFromToolUse(toolUse);
 
-			expect(mockGenericTools.getToolInfo).toHaveBeenCalledWith(toolUse, new Map());
-			expect(result).toBeDefined();
-		});
-
-		it('should handle large cached file content maps', () => {
-			const largeMap = new Map<string, string>();
-			for (let i = 0; i < 1000; i++) {
-				largeMap.set(`/test/file${i}.ts`, `content${i}`);
-			}
-
-			const toolUse: FileToolUse = {
-				id: 'test-id',
-				name: 'mcp__zcc__read_file',
-				input: { absPath: '/test/path' },
-			};
-
-			mockFileTools.getToolInfo.mockReturnValue({
-				title: 'File operation',
-				kind: 'file' as ToolKind,
-				content: [],
-			});
-
-			const result = toolsManager.getToolInfoFromToolUse(toolUse, largeMap);
-
-			expect(mockFileTools.getToolInfo).toHaveBeenCalledWith(toolUse, largeMap);
+			expect(mockGenericTools.getToolInfo).toHaveBeenCalledWith(toolUse);
 			expect(result).toBeDefined();
 		});
 
@@ -1042,12 +1016,12 @@ describe('ToolsManager', () => {
 			});
 
 			const [result1, result2] = await Promise.all([
-				Promise.resolve(toolsManager.getToolInfoFromToolUse(toolUse1, new Map())),
-				Promise.resolve(toolsManager.getToolInfoFromToolUse(toolUse2, new Map())),
+				Promise.resolve(toolsManager.getToolInfoFromToolUse(toolUse1)),
+				Promise.resolve(toolsManager.getToolInfoFromToolUse(toolUse2)),
 			]);
 
-			expect(mockFileTools.getToolInfo).toHaveBeenCalledWith(toolUse1, new Map());
-			expect(mockExecutionTools.getToolInfo).toHaveBeenCalledWith(toolUse2, new Map());
+			expect(mockFileTools.getToolInfo).toHaveBeenCalledWith(toolUse1);
+			expect(mockExecutionTools.getToolInfo).toHaveBeenCalledWith(toolUse2);
 			expect(result1).toBeDefined();
 			expect(result2).toBeDefined();
 		});
@@ -1077,7 +1051,7 @@ describe('ToolsManager', () => {
 				throw error;
 			});
 
-			expect(() => toolsManager.getToolInfoFromToolUse(toolUse, new Map())).toThrow('Generic handler failed');
+			expect(() => toolsManager.getToolInfoFromToolUse(toolUse)).toThrow('Generic handler failed');
 		});
 
 		it('should handle errors in generic fallback for tool results', () => {
@@ -1110,7 +1084,7 @@ describe('ToolsManager', () => {
 				content: [],
 			});
 
-			toolsManager.getToolInfoFromToolUse(toolUse, new Map());
+			toolsManager.getToolInfoFromToolUse(toolUse);
 
 			// Verify logger was called (we can't easily verify the exact messages due to mocking)
 			const logger = (toolsManager as any).logger;
@@ -1134,10 +1108,140 @@ describe('ToolsManager', () => {
 				content: [],
 			});
 
-			toolsManager.getToolInfoFromToolUse(toolUse, new Map());
+			toolsManager.getToolInfoFromToolUse(toolUse);
 
 			const logger = (toolsManager as any).logger;
 			expect(logger.warn).toHaveBeenCalled();
+		});
+	});
+
+	describe('Tool Use Cache Operations', () => {
+		const mockToolUse: AnyToolUse = {
+			name: 'test_tool',
+			tool_use_id: 'test-id-123',
+			parameters: { param1: 'value1' },
+		} as AnyToolUse;
+
+		describe('setToolUse', () => {
+			it('should store tool use data', () => {
+				toolsManager.setToolUse('test-id', mockToolUse);
+
+				const retrieved = toolsManager.getToolUse('test-id');
+
+				expect(retrieved).toEqual(mockToolUse);
+			});
+
+			it('should overwrite existing tool use data', () => {
+				const firstToolUse = { ...mockToolUse, parameters: { param: 'first' } };
+				const secondToolUse = { ...mockToolUse, parameters: { param: 'second' } };
+
+				toolsManager.setToolUse('test-id', firstToolUse);
+				toolsManager.setToolUse('test-id', secondToolUse);
+
+				const retrieved = toolsManager.getToolUse('test-id');
+				expect(retrieved).toEqual(secondToolUse);
+			});
+
+			it('should handle empty tool use id', () => {
+				toolsManager.setToolUse('', mockToolUse);
+
+				const retrieved = toolsManager.getToolUse('');
+				expect(retrieved).toEqual(mockToolUse);
+			});
+
+			it('should handle empty null use id', () => {
+				expect(() => {
+					toolsManager.setToolUse(null as any, mockToolUse);
+				}).not.toThrow();
+			});
+
+			it('should handle empty undefined use id', () => {
+				expect(() => {
+					toolsManager.setToolUse(undefined as any, mockToolUse);
+				}).not.toThrow();
+			});
+
+			it('should handle special characters in tool use id', () => {
+				const specialId = 'test-id-@#$%^&*()';
+				toolsManager.setToolUse(specialId, mockToolUse);
+
+				const retrieved = toolsManager.getToolUse(specialId);
+				expect(retrieved).toEqual(mockToolUse);
+			});
+		});
+
+		describe('getToolUse', () => {
+			it('should return undefined for non-existent tool use', () => {
+				const retrieved = toolsManager.getToolUse('non-existent');
+				expect(retrieved).toBeUndefined();
+			});
+
+			it('should return cached tool use data', () => {
+				toolsManager.setToolUse('test-id', mockToolUse);
+
+				const retrieved = toolsManager.getToolUse('test-id');
+				expect(retrieved).toEqual(mockToolUse);
+			});
+
+			it('should handle null parameters in tool use', () => {
+				const toolUseWithNull = { ...mockToolUse, parameters: null };
+				toolsManager.setToolUse('null-params', toolUseWithNull);
+
+				const retrieved = toolsManager.getToolUse('null-params');
+				expect(retrieved).toEqual(toolUseWithNull);
+			});
+		});
+
+		describe('concurrent tool use operations', () => {
+			it('should handle multiple tool uses stored simultaneously', () => {
+				const toolUse1 = { ...mockToolUse, tool_use_id: 'id1' };
+				const toolUse2 = { ...mockToolUse, tool_use_id: 'id2' };
+				const toolUse3 = { ...mockToolUse, tool_use_id: 'id3' };
+
+				toolsManager.setToolUse('id1', toolUse1);
+				toolsManager.setToolUse('id2', toolUse2);
+				toolsManager.setToolUse('id3', toolUse3);
+
+				expect(toolsManager.getToolUse('id1')).toEqual(toolUse1);
+				expect(toolsManager.getToolUse('id2')).toEqual(toolUse2);
+				expect(toolsManager.getToolUse('id3')).toEqual(toolUse3);
+			});
+
+			it('should handle rapid consecutive operations', () => {
+				const iterations = 100;
+
+				for (let i = 0; i < iterations; i++) {
+					const toolUse = { ...mockToolUse, tool_use_id: `id-${i}` };
+					toolsManager.setToolUse(`id-${i}`, toolUse);
+				}
+
+				for (let i = 0; i < iterations; i++) {
+					const retrieved = toolsManager.getToolUse(`id-${i}`);
+					expect(retrieved?.tool_use_id).toBe(`id-${i}`);
+				}
+			});
+		});
+	});
+
+	describe('Cache Memory Management', () => {
+		it('should handle large number of tool use cache entries', () => {
+			const entries = 1000;
+
+			for (let i = 0; i < entries; i++) {
+				const toolUse = {
+					name: 'test_tool',
+					tool_use_id: `test-${i}`,
+					parameters: { index: i },
+				} as AnyToolUse;
+
+				toolsManager.setToolUse(`id-${i}`, toolUse);
+			}
+
+			// Verify all entries are accessible
+			for (let i = 0; i < entries; i++) {
+				const retrieved = toolsManager.getToolUse(`id-${i}`);
+				expect(retrieved?.parameters).toEqual({ index: i });
+			}
 		});
 	});
 });

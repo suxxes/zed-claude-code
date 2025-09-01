@@ -16,7 +16,6 @@ import {
 	type WriteTextFileRequest,
 	type WriteTextFileResponse,
 } from '@zed-industries/agent-client-protocol';
-import { CacheManager } from '../managers/cache-manager';
 import { SessionsManager } from '../managers/sessions-manager';
 import { ToolsManager } from '../managers/tools-manager';
 import { AcpToClaudeTransformer } from '../transformers/acp-to-claude-transformer';
@@ -25,7 +24,7 @@ import { Logger } from '../utils/logger';
 
 /**
  * ACP Agent implementation that bridges Claude SDK with Agent Client Protocol.
- * Coordinates between sessions manager, cache manager, and tools manager.
+ * Coordinates between sessions manager and tools manager.
  */
 export class AcpAgent implements Agent {
 	/** ACP client for communicating with the host application */
@@ -33,8 +32,6 @@ export class AcpAgent implements Agent {
 	clientCapabilities?: ClientCapabilities;
 	/** Sessions manager for session lifecycle management */
 	protected sessionsManager: SessionsManager;
-	/** Cache manager for tool use and file content caching */
-	protected cacheManager: CacheManager;
 	/** Tools manager for tool metadata and UI integration */
 	protected toolsManager: ToolsManager;
 	/** Message transformers for bidirectional ACP ↔ Claude SDK conversion */
@@ -45,7 +42,6 @@ export class AcpAgent implements Agent {
 	constructor(client: Client) {
 		this.client = client;
 		this.sessionsManager = new SessionsManager();
-		this.cacheManager = new CacheManager();
 		this.toolsManager = new ToolsManager();
 		this.acpToClaudeTransformer = new AcpToClaudeTransformer();
 		this.claudeToAcpTransformer = new ClaudeToAcpTransformer();
@@ -209,7 +205,6 @@ export class AcpAgent implements Agent {
 						message,
 						sessionId: params.sessionId,
 						toolsManager: this.toolsManager,
-						cacheManager: this.cacheManager,
 					})) {
 						await this.client.sessionUpdate(notification);
 					}
@@ -236,11 +231,6 @@ export class AcpAgent implements Agent {
 
 		this.logger.info(`ACP readTextFile: Read ${response.content.length} characters from ${params.path}`);
 
-		// Cache full file content for optimization (when reading entire file)
-		if (!params.limit && !params.line) {
-			this.cacheManager.setFileContent(params.path, response.content);
-		}
-
 		return response;
 	}
 
@@ -253,9 +243,6 @@ export class AcpAgent implements Agent {
 
 			this.logger.info(`ACP writeTextFile: Successfully wrote ${params.content.length} characters to ${params.path}`);
 			this.logger.debug(`ACP writeTextFile response: ${JSON.stringify(response)}`);
-
-			// Update cache with new file content and start watching for changes
-			this.cacheManager.setFileContent(params.path, params.content, true);
 
 			return response;
 		} catch (error) {

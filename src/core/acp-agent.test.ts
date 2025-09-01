@@ -12,7 +12,6 @@ import type {
 	WriteTextFileResponse,
 } from '@zed-industries/agent-client-protocol';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import type { CacheManager } from '../managers/cache-manager';
 import type { SessionsManager } from '../managers/sessions-manager';
 import type { ToolsManager } from '../managers/tools-manager';
 import type { AcpToClaudeTransformer } from '../transformers/acp-to-claude-transformer';
@@ -32,14 +31,6 @@ vi.mock('../managers/sessions-manager', () => ({
 		createSession: vi.fn(),
 		getSession: vi.fn(),
 		cancelSession: vi.fn(),
-	})),
-}));
-
-vi.mock('../managers/cache-manager', () => ({
-	CacheManager: vi.fn().mockImplementation(() => ({
-		setFileContent: vi.fn(),
-		getFileContent: vi.fn(),
-		clearCache: vi.fn(),
 	})),
 }));
 
@@ -74,7 +65,6 @@ describe('AcpAgent', () => {
 	let agent: AcpAgent;
 	let mockClient: Client;
 	let mockSessionsManager: SessionsManager;
-	let mockCacheManager: CacheManager;
 	let mockToolsManager: ToolsManager;
 	let mockAcpToClaudeTransformer: AcpToClaudeTransformer;
 	let mockClaudeToAcpTransformer: ClaudeToAcpTransformer;
@@ -90,7 +80,6 @@ describe('AcpAgent', () => {
 
 		// Get references to mocked instances
 		mockSessionsManager = agent.sessionsManager;
-		mockCacheManager = agent.cacheManager;
 		mockToolsManager = agent.toolsManager;
 		mockAcpToClaudeTransformer = agent.acpToClaudeTransformer;
 		mockClaudeToAcpTransformer = agent.claudeToAcpTransformer;
@@ -111,7 +100,6 @@ describe('AcpAgent', () => {
 
 		it('should initialize all managers and transformers', () => {
 			expect(agent.sessionsManager).toBeDefined();
-			expect(agent.cacheManager).toBeDefined();
 			expect(agent.toolsManager).toBeDefined();
 			expect(agent.acpToClaudeTransformer).toBeDefined();
 			expect(agent.claudeToAcpTransformer).toBeDefined();
@@ -370,7 +358,6 @@ describe('AcpAgent', () => {
 					message: mockMessage,
 					sessionId: mockPromptRequest.sessionId,
 					toolsManager: mockToolsManager,
-					cacheManager: mockCacheManager,
 				});
 				expect(mockClient.sessionUpdate).toHaveBeenCalledWith(mockNotifications[0]);
 				expect(response).toEqual({ stopReason: 'end_turn' });
@@ -398,7 +385,6 @@ describe('AcpAgent', () => {
 					message: mockMessage,
 					sessionId: mockPromptRequest.sessionId,
 					toolsManager: mockToolsManager,
-					cacheManager: mockCacheManager,
 				});
 				expect(mockClient.sessionUpdate).toHaveBeenCalledWith(mockNotifications[0]);
 				expect(response).toEqual({ stopReason: 'end_turn' });
@@ -625,41 +611,6 @@ describe('AcpAgent', () => {
 			expect(response).toBe(mockResponse);
 		});
 
-		it('should cache full file content when no limit or line specified', async () => {
-			const mockResponse: ReadTextFileResponse = {
-				content: 'full file content',
-			};
-			vi.mocked(mockClient.readTextFile).mockResolvedValue(mockResponse);
-
-			await agent.readTextFile(mockReadRequest);
-
-			expect(mockCacheManager.setFileContent).toHaveBeenCalledWith('/test/file.txt', 'full file content');
-		});
-
-		it('should not cache when limit is specified', async () => {
-			const requestWithLimit = { ...mockReadRequest, limit: 100 };
-			const mockResponse: ReadTextFileResponse = {
-				content: 'partial content',
-			};
-			vi.mocked(mockClient.readTextFile).mockResolvedValue(mockResponse);
-
-			await agent.readTextFile(requestWithLimit);
-
-			expect(mockCacheManager.setFileContent).not.toHaveBeenCalled();
-		});
-
-		it('should not cache when line is specified', async () => {
-			const requestWithLine = { ...mockReadRequest, line: 5 };
-			const mockResponse: ReadTextFileResponse = {
-				content: 'line content',
-			};
-			vi.mocked(mockClient.readTextFile).mockResolvedValue(mockResponse);
-
-			await agent.readTextFile(requestWithLine);
-
-			expect(mockCacheManager.setFileContent).not.toHaveBeenCalled();
-		});
-
 		it('should handle client read errors', async () => {
 			const error = new Error('File not found');
 			vi.mocked(mockClient.readTextFile).mockRejectedValue(error);
@@ -686,29 +637,11 @@ describe('AcpAgent', () => {
 			expect(response).toBe(mockResponse);
 		});
 
-		it('should update cache with new content and start watching', async () => {
-			const mockResponse: WriteTextFileResponse = {
-				success: true,
-			};
-			vi.mocked(mockClient.writeTextFile).mockResolvedValue(mockResponse);
-
-			await agent.writeTextFile(mockWriteRequest);
-
-			expect(mockCacheManager.setFileContent).toHaveBeenCalledWith(
-				'/test/output.txt',
-				'new file content',
-				true, // startWatching = true
-			);
-		});
-
 		it('should handle client write errors', async () => {
 			const error = new Error('Permission denied');
 			vi.mocked(mockClient.writeTextFile).mockRejectedValue(error);
 
 			await expect(agent.writeTextFile(mockWriteRequest)).rejects.toThrow('Permission denied');
-
-			// Should not update cache on error
-			expect(mockCacheManager.setFileContent).not.toHaveBeenCalled();
 		});
 
 		it('should handle large file writes', async () => {
@@ -722,7 +655,6 @@ describe('AcpAgent', () => {
 			await agent.writeTextFile(requestWithLargeContent);
 
 			expect(mockClient.writeTextFile).toHaveBeenCalledWith(requestWithLargeContent);
-			expect(mockCacheManager.setFileContent).toHaveBeenCalledWith('/test/output.txt', largeContent, true);
 		});
 
 		it('should handle empty file writes', async () => {
@@ -735,7 +667,6 @@ describe('AcpAgent', () => {
 			await agent.writeTextFile(emptyRequest);
 
 			expect(mockClient.writeTextFile).toHaveBeenCalledWith(emptyRequest);
-			expect(mockCacheManager.setFileContent).toHaveBeenCalledWith('/test/output.txt', '', true);
 		});
 	});
 
@@ -787,33 +718,6 @@ describe('AcpAgent', () => {
 
 			expect(mockSessionsManager.createSession).toHaveBeenCalled();
 			expect(mockSessionsManager.cancelSession).toHaveBeenCalled();
-		});
-
-		it('should handle file operations with caching', async () => {
-			// Write file
-			const writeResponse: WriteTextFileResponse = { success: true };
-			vi.mocked(mockClient.writeTextFile).mockResolvedValue(writeResponse);
-
-			await agent.writeTextFile({
-				path: '/integration/test.txt',
-				content: 'integration test content',
-			});
-
-			// Read file
-			const readResponse: ReadTextFileResponse = {
-				content: 'integration test content',
-			};
-			vi.mocked(mockClient.readTextFile).mockResolvedValue(readResponse);
-
-			await agent.readTextFile({ path: '/integration/test.txt' });
-
-			// Verify caching behavior
-			expect(mockCacheManager.setFileContent).toHaveBeenCalledWith(
-				'/integration/test.txt',
-				'integration test content',
-				true,
-			);
-			expect(mockCacheManager.setFileContent).toHaveBeenCalledWith('/integration/test.txt', 'integration test content');
 		});
 
 		it('should handle error propagation across components', async () => {
@@ -873,7 +777,6 @@ describe('AcpAgent', () => {
 			expect(results).toHaveLength(10);
 			// Check that we successfully completed the operations
 			expect(mockClient.writeTextFile).toHaveBeenCalledTimes(10);
-			expect(mockCacheManager.setFileContent).toHaveBeenCalledTimes(10);
 		});
 
 		it('should handle malformed session data gracefully', async () => {

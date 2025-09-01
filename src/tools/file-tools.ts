@@ -33,7 +33,7 @@ export type FileToolUse = {
  * File operations tool handler - handles read, edit, write, and multi-edit operations
  */
 export class FileToolsHandler implements ToolHandler {
-	getToolInfo(toolUse: FileToolUse, _cachedFileContent: Map<string, string>): ToolInfo {
+	getToolInfo(toolUse: FileToolUse): ToolInfo {
 		const name = toolUse.name;
 		const input = toolUse.input;
 

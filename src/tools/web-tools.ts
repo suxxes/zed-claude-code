@@ -22,7 +22,7 @@ export type WebToolUse = {
  * Web operations tool handler - handles WebFetch and WebSearch operations
  */
 export class WebToolsHandler implements ToolHandler {
-	getToolInfo(toolUse: WebToolUse, _cachedFileContent: Map<string, string>): ToolInfo {
+	getToolInfo(toolUse: WebToolUse): ToolInfo {
 		const name = toolUse.name;
 		const input = toolUse.input;
 

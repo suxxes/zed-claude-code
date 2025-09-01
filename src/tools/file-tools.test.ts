@@ -14,11 +14,9 @@ vi.mock('../utils/logger', () => ({
 
 describe('FileToolsHandler', () => {
 	let handler: FileToolsHandler;
-	let cachedFileContent: Map<string, string>;
 
 	beforeEach(() => {
 		handler = new FileToolsHandler();
-		cachedFileContent = new Map();
 	});
 
 	afterEach(() => {
@@ -36,7 +34,7 @@ describe('FileToolsHandler', () => {
 					},
 				};
 
-				const result = handler.getToolInfo(toolUse, cachedFileContent);
+				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
 					title: 'Read /test/file.txt',
@@ -60,7 +58,7 @@ describe('FileToolsHandler', () => {
 					},
 				};
 
-				const result = handler.getToolInfo(toolUse, cachedFileContent);
+				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
 					title: 'Read /test/mcp-file.txt',
@@ -86,7 +84,7 @@ describe('FileToolsHandler', () => {
 					},
 				};
 
-				const result = handler.getToolInfo(toolUse, cachedFileContent);
+				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
 					title: 'Read /test/file.txt (11 - 30)',
@@ -111,7 +109,7 @@ describe('FileToolsHandler', () => {
 					},
 				};
 
-				const result = handler.getToolInfo(toolUse, cachedFileContent);
+				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
 					title: 'Read /test/file.txt (from line 6)',
@@ -133,7 +131,7 @@ describe('FileToolsHandler', () => {
 					input: {},
 				};
 
-				const result = handler.getToolInfo(toolUse, cachedFileContent);
+				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
 					title: 'Read File',
@@ -155,7 +153,7 @@ describe('FileToolsHandler', () => {
 					},
 				};
 
-				const result = handler.getToolInfo(toolUse, cachedFileContent);
+				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
 					title: 'Write /test/new-file.txt',
@@ -182,7 +180,7 @@ describe('FileToolsHandler', () => {
 					} as any,
 				};
 
-				const result = handler.getToolInfo(toolUse, cachedFileContent);
+				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
 					title: 'Write /test/mcp-new-file.txt',
@@ -210,7 +208,7 @@ describe('FileToolsHandler', () => {
 					},
 				};
 
-				const result = handler.getToolInfo(toolUse, cachedFileContent);
+				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
 					title: 'Edit /test/edit-file.txt',
@@ -227,36 +225,6 @@ describe('FileToolsHandler', () => {
 				});
 			});
 
-			it('should handle edit operation with cached file content', () => {
-				cachedFileContent.set('/test/cached-file.txt', 'line 1\nold content\nline 3');
-
-				const toolUse: FileToolUse = {
-					id: 'test-9',
-					name: 'Edit',
-					input: {
-						file_path: '/test/cached-file.txt',
-						old_text: 'old content',
-						new_text: 'new content',
-					},
-				};
-
-				const result = handler.getToolInfo(toolUse, cachedFileContent);
-
-				expect(result).toEqual({
-					title: 'Edit /test/cached-file.txt',
-					kind: 'edit',
-					content: [
-						{
-							type: 'diff',
-							path: '/test/cached-file.txt',
-							oldText: 'old content',
-							newText: 'new content',
-						},
-					],
-					locations: [{ path: '/test/cached-file.txt' }],
-				});
-			});
-
 			it('should handle edit operation without path', () => {
 				const toolUse: FileToolUse = {
 					id: 'test-10',
@@ -267,7 +235,7 @@ describe('FileToolsHandler', () => {
 					},
 				};
 
-				const result = handler.getToolInfo(toolUse, cachedFileContent);
+				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
 					title: 'Edit',
@@ -292,7 +260,7 @@ describe('FileToolsHandler', () => {
 					},
 				};
 
-				const result = handler.getToolInfo(toolUse, cachedFileContent);
+				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
 					title: 'Edit /test/multi_edit-file.txt',
@@ -315,44 +283,6 @@ describe('FileToolsHandler', () => {
 				});
 			});
 
-			it('should handle multi_edit with cached content', () => {
-				cachedFileContent.set('/test/multi-cached.txt', 'old1 text\nold2 and old2 again');
-
-				const toolUse: FileToolUse = {
-					id: 'test-12',
-					name: 'MultiEdit',
-					input: {
-						file_path: '/test/multi-cached.txt',
-						edits: [
-							{ old_string: 'old1', new_string: 'new1' },
-							{ old_string: 'old2', new_string: 'new2', replace_all: true },
-						],
-					},
-				};
-
-				const result = handler.getToolInfo(toolUse, cachedFileContent);
-
-				expect(result).toEqual({
-					title: 'Edit /test/multi-cached.txt',
-					kind: 'edit',
-					content: [
-						{
-							type: 'diff',
-							path: '/test/multi-cached.txt',
-							oldText: 'old1',
-							newText: 'new1',
-						},
-						{
-							type: 'diff',
-							path: '/test/multi-cached.txt',
-							oldText: 'old2',
-							newText: 'new2',
-						},
-					],
-					locations: [{ path: '/test/multi-cached.txt' }],
-				});
-			});
-
 			it('should handle multi_edit without path', () => {
 				const toolUse: FileToolUse = {
 					id: 'test-13',
@@ -363,7 +293,7 @@ describe('FileToolsHandler', () => {
 					} as any,
 				};
 
-				const result = handler.getToolInfo(toolUse, cachedFileContent);
+				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
 					title: 'Edit',
@@ -388,7 +318,7 @@ describe('FileToolsHandler', () => {
 				input: {},
 			};
 
-			expect(() => handler.getToolInfo(toolUse, cachedFileContent)).toThrow('Unsupported tool: UnsupportedTool');
+			expect(() => handler.getToolInfo(toolUse)).toThrow('Unsupported tool: UnsupportedTool');
 		});
 	});
 
