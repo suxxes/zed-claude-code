@@ -304,7 +304,7 @@ REQUIREMENTS:
 					],
 				};
 			} catch (error: unknown) {
-				this.logger.error(`MCP edit/write error: ${error instanceof Error ? error.message : String(error)}`);
+				this.logger.error(`MCP edit/write error: ${error instanceof Error ? error.message : JSON.stringify(error)}`);
 
 				if (error instanceof Error) {
 					this.logger.error(`MCP edit/write stack trace: ${error.stack}`);
@@ -316,7 +316,7 @@ REQUIREMENTS:
 					content: [
 						{
 							type: 'text',
-							text: `Operation failed: ${error instanceof Error ? error.message : String(error)}`,
+							text: `Operation failed: ${error instanceof Error ? error.message : JSON.stringify(error)}`,
 						},
 					],
 				};
