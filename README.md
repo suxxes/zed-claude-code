@@ -1,5 +1,9 @@
 # Zed Claude Code
 
+[![Tests](https://github.com/suxxes/zed-claude-code/actions/workflows/test.yml/badge.svg)](https://github.com/suxxes/zed-claude-code/actions/workflows/test.yml)
+[![NPM version](https://img.shields.io/npm/v/zed-claude-code)](https://www.npmjs.com/package/zed-claude-code)
+[![License: Apache 2.0](https://img.shields.io/github/license/suxxes/zed-claude-code)](https://github.com/suxxes/zed-claude-code/blob/main/LICENSE)
+
 ## Overview
 
 Zed Claude Code is a multi-protocol server that enables seamless integration between Claude Code and Zed through the **Agent Client Protocol (ACP)** and **Model Context Protocol (MCP)**. It functions as an intelligent translation layer that bridges different protocol formats while providing robust, scalable communication between Claude Code capabilities and diverse client applications.
