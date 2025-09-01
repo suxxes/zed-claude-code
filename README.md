@@ -1,3 +1,5 @@
+[![MseeP.ai Security Assessment Badge](https://mseep.net/pr/suxxes-zed-claude-code-badge.png)](https://mseep.ai/app/suxxes-zed-claude-code)
+
 # Zed Claude Code
 
 ## Overview
