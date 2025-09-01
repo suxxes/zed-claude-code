@@ -2,31 +2,24 @@ import type { ClaudeToolResult, McpToolResult, ToolHandler, ToolInfo, ToolUpdate
 
 // File operation types (used by file tools handlers)
 export interface ReadFileInput {
-	absPath?: string; // Standard format
-	path?: string; // MCP format
+	file_path?: string; // MCP format
 	offset?: number;
 	limit?: number;
 }
 
-export interface PathFileInput extends ReadFileInput {
-	absPath?: string; // Standard format
-	path: string; // MCP format
-}
-
 export interface EditFileInput {
-	absPath?: string; // Standard format
 	file_path?: string; // MCP format
-	oldText?: string;
-	newText?: string;
+	old_text?: string;
+	new_text?: string;
 	content?: string; // For write operations
 }
 
 export interface MultiEditInput {
-	filePath: string;
+	file_path: string;
 	edits: Array<{
-		oldString: string;
-		newString: string;
-		replaceAll?: boolean;
+		old_string: string;
+		new_string: string;
+		replace_all?: boolean;
 	}>;
 }
 
@@ -40,7 +33,7 @@ export type FileToolUse = {
  * File operations tool handler - handles read, edit, write, and multi-edit operations
  */
 export class FileToolsHandler implements ToolHandler {
-	getToolInfo(toolUse: FileToolUse, cachedFileContent: Map<string, string>): ToolInfo {
+	getToolInfo(toolUse: FileToolUse, _cachedFileContent: Map<string, string>): ToolInfo {
 		const name = toolUse.name;
 		const input = toolUse.input;
 
@@ -53,11 +46,11 @@ export class FileToolsHandler implements ToolHandler {
 			case 'mcp__zcc__write_file':
 			case 'Edit':
 			case 'Write':
-				return this.handleEditTool(input as EditFileInput, cachedFileContent);
+				return this.handleEditTool(input as EditFileInput);
 
 			case 'mcp__zcc__multi_edit':
 			case 'MultiEdit':
-				return this.handleMultiEditTool(input as MultiEditInput, cachedFileContent);
+				return this.handleMultiEditTool(input as MultiEditInput);
 
 			default:
 				throw new Error(`Unsupported tool: ${name}`);
@@ -95,8 +88,8 @@ export class FileToolsHandler implements ToolHandler {
 	 * Handle file read operations
 	 */
 	protected handleReadTool(input: ReadFileInput): ToolInfo {
-		// Get the file path from either absPath or path (MCP tools use path)
-		const filePath = input.absPath || input.path;
+		// Get the file path from file_path (MCP tools use file_path)
+		const filePath = input.file_path;
 
 		let limit = '';
 
@@ -124,12 +117,12 @@ export class FileToolsHandler implements ToolHandler {
 	/**
 	 * Handle edit/write operations (unified handler)
 	 */
-	protected handleEditTool(input: EditFileInput, _cachedFileContent: Map<string, string>): ToolInfo {
-		// Get the file path from either absPath or file_path (MCP tools use file_path)
-		const filePath = input.absPath || input.file_path;
+	protected handleEditTool(input: EditFileInput): ToolInfo {
+		// Get the file path from file_path (MCP tools use file_path)
+		const filePath = input.file_path;
 
 		// Handle write operation (content provided)
-		if (input.content && !input.oldText) {
+		if (input.content && !input.old_text) {
 			return {
 				title: filePath ? `Write ${filePath}` : 'Write',
 				kind: 'edit',
@@ -155,8 +148,8 @@ export class FileToolsHandler implements ToolHandler {
 						{
 							type: 'diff',
 							path: filePath,
-							oldText: input.oldText || null,
-							newText: input.newText || '',
+							oldText: input.old_text,
+							newText: input.new_text || '',
 						},
 					]
 				: [],
@@ -167,30 +160,24 @@ export class FileToolsHandler implements ToolHandler {
 	/**
 	 * Handle multi-edit operations
 	 */
-	protected handleMultiEditTool(input: MultiEditInput, cachedFileContent: Map<string, string>): ToolInfo {
-		let oldTextMulti = input.edits.map((edit) => edit.oldString).join('\n');
-		const newTextMulti = input.edits.map((edit) => edit.newString).join('\n');
-
-		try {
-			if (input.edits && input.filePath) {
-				oldTextMulti = cachedFileContent.get(input.filePath) || input.edits.map((edit) => edit.oldString).join('\n');
-			}
-		} catch {
-			//
-		}
-
+	protected handleMultiEditTool(input: MultiEditInput): ToolInfo {
 		return {
-			title: input?.filePath ? `Edit ${input.filePath}` : 'Edit',
+			title: input?.file_path ? `Edit ${input.file_path}` : 'Edit',
 			kind: 'edit',
-			content: [
-				{
-					type: 'diff',
-					path: input.filePath,
-					oldText: oldTextMulti,
-					newText: newTextMulti,
+			content: input.edits.reduce(
+				(content, edit) => {
+					content.push({
+						type: 'diff',
+						path: input.file_path,
+						oldText: edit.old_string,
+						newText: edit.new_string,
+					});
+
+					return content;
 				},
-			],
-			locations: input?.filePath ? [{ path: input.filePath }] : [],
+				[] as ToolInfo['content'],
+			),
+			locations: input?.file_path ? [{ path: input.file_path }] : [],
 		};
 	}
 
@@ -246,10 +233,7 @@ export class FileToolsHandler implements ToolHandler {
 
 				if (data.lineNumbers && Array.isArray(data.lineNumbers)) {
 					const locations = data.lineNumbers.map((line: number) => ({
-						path:
-							'absPath' in toolUse.input
-								? (toolUse.input as ReadFileInput | EditFileInput).absPath
-								: (toolUse.input as MultiEditInput).filePath,
+						path: toolUse.input.file_path,
 						line: line,
 					}));
 
@@ -279,10 +263,7 @@ export class FileToolsHandler implements ToolHandler {
 
 				if (data.lineNumbers && Array.isArray(data.lineNumbers)) {
 					const locations = data.lineNumbers.map((line: number) => ({
-						path:
-							'filePath' in toolUse.input
-								? (toolUse.input as MultiEditInput).filePath
-								: (toolUse.input as ReadFileInput | EditFileInput).absPath,
+						path: toolUse.input.file_path,
 						line: line,
 					}));
 
