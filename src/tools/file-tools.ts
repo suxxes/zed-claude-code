@@ -2,24 +2,24 @@ import type { ClaudeToolResult, McpToolResult, ToolHandler, ToolInfo, ToolUpdate
 
 // File operation types (used by file tools handlers)
 export interface ReadFileInput {
-	file_path?: string; // MCP format
+	filePath?: string; // MCP format
 	offset?: number;
 	limit?: number;
 }
 
 export interface EditFileInput {
-	file_path?: string; // MCP format
-	old_text?: string;
-	new_text?: string;
+	filePath?: string; // MCP format
+	oldText?: string;
+	newText?: string;
 	content?: string; // For write operations
 }
 
 export interface MultiEditInput {
-	file_path: string;
+	filePath: string;
 	edits: Array<{
-		old_string: string;
-		new_string: string;
-		replace_all?: boolean;
+		oldString: string;
+		newString: string;
+		replaceAll?: boolean;
 	}>;
 }
 
@@ -88,9 +88,6 @@ export class FileToolsHandler implements ToolHandler {
 	 * Handle file read operations
 	 */
 	protected handleReadTool(input: ReadFileInput): ToolInfo {
-		// Get the file path from file_path (MCP tools use file_path)
-		const filePath = input.file_path;
-
 		let limit = '';
 
 		if (input.limit) {
@@ -100,12 +97,12 @@ export class FileToolsHandler implements ToolHandler {
 		}
 
 		return {
-			title: `Read ${filePath ?? 'File'}${limit}`,
+			title: `Read ${input.filePath ?? 'File'}${limit}`,
 			kind: 'read',
-			locations: filePath
+			locations: input.filePath
 				? [
 						{
-							path: filePath,
+							path: input.filePath,
 							line: input.offset ?? 0,
 						},
 					]
@@ -118,42 +115,39 @@ export class FileToolsHandler implements ToolHandler {
 	 * Handle edit/write operations (unified handler)
 	 */
 	protected handleEditTool(input: EditFileInput): ToolInfo {
-		// Get the file path from file_path (MCP tools use file_path)
-		const filePath = input.file_path;
-
 		// Handle write operation (content provided)
-		if (input.content && !input.old_text) {
+		if (input.content && !input.oldText) {
 			return {
-				title: filePath ? `Write ${filePath}` : 'Write',
+				title: input.filePath ? `Write ${input.filePath}` : 'Write',
 				kind: 'edit',
-				content: filePath
+				content: input.filePath
 					? [
 							{
 								type: 'diff',
-								path: filePath,
+								path: input.filePath,
 								oldText: null,
 								newText: input.content,
 							},
 						]
 					: [],
-				locations: filePath ? [{ path: filePath }] : [],
+				locations: input.filePath ? [{ path: input.filePath }] : [],
 			};
 		}
 
 		return {
-			title: filePath ? `Edit ${filePath}` : 'Edit',
+			title: input.filePath ? `Edit ${input.filePath}` : 'Edit',
 			kind: 'edit',
-			content: filePath
+			content: input.filePath
 				? [
 						{
 							type: 'diff',
-							path: filePath,
-							oldText: input.old_text,
-							newText: input.new_text || '',
+							path: input.filePath,
+							oldText: input.oldText,
+							newText: input.newText || '',
 						},
 					]
 				: [],
-			locations: filePath ? [{ path: filePath }] : [],
+			locations: input.filePath ? [{ path: input.filePath }] : [],
 		};
 	}
 
@@ -162,22 +156,22 @@ export class FileToolsHandler implements ToolHandler {
 	 */
 	protected handleMultiEditTool(input: MultiEditInput): ToolInfo {
 		return {
-			title: input?.file_path ? `Edit ${input.file_path}` : 'Edit',
+			title: input?.filePath ? `Edit ${input.filePath}` : 'Edit',
 			kind: 'edit',
 			content: input.edits.reduce(
 				(content, edit) => {
 					content.push({
 						type: 'diff',
-						path: input.file_path,
-						oldText: edit.old_string,
-						newText: edit.new_string,
+						path: input.filePath,
+						oldText: edit.oldString,
+						newText: edit.newString,
 					});
 
 					return content;
 				},
 				[] as ToolInfo['content'],
 			),
-			locations: input?.file_path ? [{ path: input.file_path }] : [],
+			locations: input?.filePath ? [{ path: input.filePath }] : [],
 		};
 	}
 
@@ -233,7 +227,7 @@ export class FileToolsHandler implements ToolHandler {
 
 				if (data.lineNumbers && Array.isArray(data.lineNumbers)) {
 					const locations = data.lineNumbers.map((line: number) => ({
-						path: toolUse.input.file_path,
+						path: toolUse.input.filePath,
 						line: line,
 					}));
 
@@ -263,7 +257,7 @@ export class FileToolsHandler implements ToolHandler {
 
 				if (data.lineNumbers && Array.isArray(data.lineNumbers)) {
 					const locations = data.lineNumbers.map((line: number) => ({
-						path: toolUse.input.file_path,
+						path: toolUse.input.filePath,
 						line: line,
 					}));
 

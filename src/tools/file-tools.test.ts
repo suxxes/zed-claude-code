@@ -25,12 +25,12 @@ describe('FileToolsHandler', () => {
 
 	describe('getToolInfo', () => {
 		describe('mcp__zcc__read_file and Read tools', () => {
-			it('should handle read tool with file_path', () => {
+			it('should handle read tool with filePath', () => {
 				const toolUse: FileToolUse = {
 					id: 'test-1',
 					name: 'mcp__zcc__read_file',
 					input: {
-						file_path: '/test/file.txt',
+						filePath: '/test/file.txt',
 					},
 				};
 
@@ -49,12 +49,12 @@ describe('FileToolsHandler', () => {
 				});
 			});
 
-			it('should handle read tool with file_path property (MCP format)', () => {
+			it('should handle read tool with filePath property (MCP format)', () => {
 				const toolUse: FileToolUse = {
 					id: 'test-2',
 					name: 'Read',
 					input: {
-						file_path: '/test/mcp-file.txt',
+						filePath: '/test/mcp-file.txt',
 					},
 				};
 
@@ -78,7 +78,7 @@ describe('FileToolsHandler', () => {
 					id: 'test-3',
 					name: 'mcp__zcc__read_file',
 					input: {
-						file_path: '/test/file.txt',
+						filePath: '/test/file.txt',
 						offset: 10,
 						limit: 20,
 					},
@@ -104,7 +104,7 @@ describe('FileToolsHandler', () => {
 					id: 'test-4',
 					name: 'Read',
 					input: {
-						file_path: '/test/file.txt',
+						filePath: '/test/file.txt',
 						offset: 5,
 					},
 				};
@@ -148,7 +148,7 @@ describe('FileToolsHandler', () => {
 					id: 'test-6',
 					name: 'mcp__zcc__write_file',
 					input: {
-						file_path: '/test/new-file.txt',
+						filePath: '/test/new-file.txt',
 						content: 'Hello, world!',
 					},
 				};
@@ -170,12 +170,12 @@ describe('FileToolsHandler', () => {
 				});
 			});
 
-			it('should handle write operation with file_path property (MCP format)', () => {
+			it('should handle write operation with filePath property (MCP format)', () => {
 				const toolUse: FileToolUse = {
 					id: 'test-7',
 					name: 'Write',
 					input: {
-						file_path: '/test/mcp-new-file.txt',
+						filePath: '/test/mcp-new-file.txt',
 						content: 'MCP content',
 					} as any,
 				};
@@ -202,9 +202,9 @@ describe('FileToolsHandler', () => {
 					id: 'test-8',
 					name: 'mcp__zcc__edit_file',
 					input: {
-						file_path: '/test/edit-file.txt',
-						old_text: 'old content',
-						new_text: 'new content',
+						filePath: '/test/edit-file.txt',
+						oldText: 'old content',
+						newText: 'new content',
 					},
 				};
 
@@ -230,8 +230,8 @@ describe('FileToolsHandler', () => {
 					id: 'test-10',
 					name: 'Edit',
 					input: {
-						old_text: 'old',
-						new_text: 'new',
+						oldText: 'old',
+						newText: 'new',
 					},
 				};
 
@@ -252,10 +252,10 @@ describe('FileToolsHandler', () => {
 					id: 'test-11',
 					name: 'mcp__zcc__multi_edit',
 					input: {
-						file_path: '/test/multi_edit-file.txt',
+						filePath: '/test/multi_edit-file.txt',
 						edits: [
-							{ old_string: 'old1', new_string: 'new1' },
-							{ old_string: 'old2', new_string: 'new2', replace_all: true },
+							{ oldString: 'old1', newString: 'new1' },
+							{ oldString: 'old2', newString: 'new2', replaceAll: true },
 						],
 					},
 				};
@@ -288,8 +288,8 @@ describe('FileToolsHandler', () => {
 					id: 'test-13',
 					name: 'MultiEdit',
 					input: {
-						file_path: undefined,
-						edits: [{ old_string: 'old1', new_string: 'new1' }],
+						filePath: undefined,
+						edits: [{ oldString: 'old1', newString: 'new1' }],
 					} as any,
 				};
 
@@ -332,7 +332,7 @@ describe('FileToolsHandler', () => {
 				const toolUse: FileToolUse = {
 					id: 'test-15',
 					name: 'Read',
-					input: { file_path: '/test/file.txt' },
+					input: { filePath: '/test/file.txt' },
 				};
 
 				const result = handler.getToolUpdate(toolResult, toolUse);
@@ -360,7 +360,7 @@ describe('FileToolsHandler', () => {
 				const toolUse: FileToolUse = {
 					id: 'test',
 					name: 'Read',
-					input: { file_path: '/test/file.txt' },
+					input: { filePath: '/test/file.txt' },
 				};
 
 				const result = handler.getToolUpdate(toolResult, toolUse);
@@ -376,7 +376,7 @@ describe('FileToolsHandler', () => {
 				const toolUse: FileToolUse = {
 					id: 'test',
 					name: 'Read',
-					input: { file_path: '/test/file.txt' },
+					input: { filePath: '/test/file.txt' },
 				};
 
 				const result = handler.getToolUpdate(toolResult, toolUse);
@@ -397,7 +397,7 @@ describe('FileToolsHandler', () => {
 				const toolUse: FileToolUse = {
 					id: 'test-16',
 					name: 'Edit',
-					input: { file_path: '/test/edited-file.txt' },
+					input: { filePath: '/test/edited-file.txt' },
 				};
 
 				const result = handler.getToolUpdate(toolResult, toolUse);
@@ -411,7 +411,7 @@ describe('FileToolsHandler', () => {
 				});
 			});
 
-			it('should handle edit update with MCP file_path', () => {
+			it('should handle edit update with MCP filePath', () => {
 				const toolResult: McpToolResult = {
 					content: [{ type: 'text', text: '{"lineNumbers": [3]}' }],
 				};
@@ -419,7 +419,7 @@ describe('FileToolsHandler', () => {
 				const toolUse: FileToolUse = {
 					id: 'test-17',
 					name: 'mcp__zcc__edit_file',
-					input: { file_path: '/test/mcp-edited.txt' } as any,
+					input: { filePath: '/test/mcp-edited.txt' } as any,
 				};
 
 				const result = handler.getToolUpdate(toolResult, toolUse);
@@ -437,7 +437,7 @@ describe('FileToolsHandler', () => {
 				const toolUse: FileToolUse = {
 					id: 'test-18',
 					name: 'Edit',
-					input: { file_path: '/test/file.txt' },
+					input: { filePath: '/test/file.txt' },
 				};
 
 				const result = handler.getToolUpdate(toolResult, toolUse);
@@ -453,7 +453,7 @@ describe('FileToolsHandler', () => {
 				const toolUse: FileToolUse = {
 					id: 'test-19',
 					name: 'Edit',
-					input: { file_path: '/test/file.txt' },
+					input: { filePath: '/test/file.txt' },
 				};
 
 				const result = handler.getToolUpdate(toolResult, toolUse);
@@ -472,8 +472,8 @@ describe('FileToolsHandler', () => {
 					id: 'test-20',
 					name: 'MultiEdit',
 					input: {
-						file_path: '/test/multi_edited.txt',
-						edits: [{ old_string: 'old', new_string: 'new' }],
+						filePath: '/test/multi_edited.txt',
+						edits: [{ oldString: 'old', newString: 'new' }],
 					},
 				};
 
@@ -487,7 +487,7 @@ describe('FileToolsHandler', () => {
 				});
 			});
 
-			it('should handle multi_edit update fallback to file_path', () => {
+			it('should handle multi_edit update fallback to filePath', () => {
 				const toolResult: McpToolResult = {
 					content: [{ type: 'text', text: '{"lineNumbers": [1]}' }],
 				};
@@ -496,8 +496,8 @@ describe('FileToolsHandler', () => {
 					id: 'test-21',
 					name: 'MultiEdit',
 					input: {
-						file_path: '/test/fallback.txt',
-						edits: [{ old_string: 'old', new_string: 'new' }],
+						filePath: '/test/fallback.txt',
+						edits: [{ oldString: 'old', newString: 'new' }],
 					} as any,
 				};
 
@@ -530,7 +530,7 @@ describe('FileToolsHandler', () => {
 			const toolUse: FileToolUse = {
 				id: 'test',
 				name: 'Read',
-				input: { file_path: '/test/file.txt' },
+				input: { filePath: '/test/file.txt' },
 			};
 
 			const result = handler.getToolUpdate(toolResult, toolUse);
@@ -550,7 +550,7 @@ describe('FileToolsHandler', () => {
 			const toolUse: FileToolUse = {
 				id: 'test',
 				name: 'Read',
-				input: { file_path: '/test/file.txt' },
+				input: { filePath: '/test/file.txt' },
 			};
 
 			const result = handler.getToolUpdate(toolResult, toolUse);
@@ -570,7 +570,7 @@ describe('FileToolsHandler', () => {
 			const toolUse: FileToolUse = {
 				id: 'test',
 				name: 'Read',
-				input: { file_path: '/test/file.txt' },
+				input: { filePath: '/test/file.txt' },
 			};
 
 			const result = handler.getToolUpdate(toolResult, toolUse);

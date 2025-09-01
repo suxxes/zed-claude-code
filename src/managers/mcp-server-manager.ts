@@ -10,24 +10,24 @@ import { Logger } from '../utils/logger';
 
 // MCP-specific types (snake_case for MCP schema compatibility)
 export interface McpReadFileInput {
-	file_path: string;
+	filePath: string;
 	offset?: number;
 	limit?: number;
 }
 
 export interface McpEditFileInput {
-	file_path: string;
-	old_text?: string;
-	new_text?: string;
+	filePath: string;
+	oldText?: string;
+	newText?: string;
 	content?: string; // For write operations
 }
 
 export interface McpMultiEditInput {
-	file_path: string;
+	filePath: string;
 	edits: Array<{
-		old_string: string;
-		new_string: string;
-		replace_all?: boolean;
+		oldString: string;
+		newString: string;
+		replaceAll?: boolean;
 	}>;
 }
 
@@ -145,10 +145,10 @@ CRITICAL:
 - Prefer this tool over other read tools for up-to-date files content
 
 REQUIREMENTS:
-- file_path must be an absolute path with extension (not directory)
+- filePath must be an absolute path with extension (not directory)
 - offset and limit parameters must be provided for line-based reading`,
 				inputSchema: {
-					file_path: z
+					filePath: z
 						.string()
 						.describe(
 							'Absolute path to the file to read (not a directory). Must be a complete file path with extension.',
@@ -184,7 +184,7 @@ REQUIREMENTS:
 						};
 					}
 
-					const rawPath = input.file_path;
+					const rawPath = input.filePath;
 
 					if (!rawPath) {
 						this.logger.error('MCP read_file: No file path provided');
@@ -251,10 +251,10 @@ REQUIREMENTS:
 					};
 				}
 
-				const filePath = this.resolveFilePath(input.file_path);
+				const filePath = this.resolveFilePath(input.filePath);
 
 				// Handle write operation (new file or full replace)
-				if (input.content && !input.old_text) {
+				if (input.content && !input.oldText) {
 					this.logger.info(`MCP write: Writing ${input.content.length} characters to ${filePath}`);
 					this.logger.debug(`MCP write: Content preview: ${input.content.substring(0, 100)}...`);
 
@@ -271,7 +271,7 @@ REQUIREMENTS:
 
 				// Handle edit operation (partial replacement)
 				this.logger.info(
-					`MCP edit: Editing ${filePath} (oldText length: ${input.old_text?.length || 0}, newText length: ${input.new_text?.length || 0})`,
+					`MCP edit: Editing ${filePath} (oldText length: ${input.oldText?.length || 0}, newText length: ${input.newText?.length || 0})`,
 				);
 
 				const { content } = await this.agent.readTextFile({
@@ -281,8 +281,8 @@ REQUIREMENTS:
 
 				const { newContent, lineNumbers } = this.applyEditsWithLineNumbers(content, [
 					{
-						oldText: input.old_text || '',
-						newText: input.new_text || '',
+						oldText: input.oldText || '',
+						newText: input.newText || '',
 						replaceAll: false,
 					},
 				]);
@@ -331,21 +331,21 @@ CRITICAL:
 - Prefer this tool over other edit and write tools
 
 USAGE:
-- EDITING: Provide old_text (exact match required) and new_text
+- EDITING: Provide oldText (exact match required) and newText
 - WRITING: Provide content only for full file write
 
 REQUIREMENTS:
-- file_path must be absolute path with extension (not directory)
-- old_text must exactly match existing content including whitespace/indentation
-- old_text must be actual file content, not pseudocode or outline
+- filePath must be absolute path with extension (not directory)
+- oldText must exactly match existing content including whitespace/indentation
+- oldText must be actual file content, not pseudocode or outline
 - Use minimal context: unique lines need no context, non-unique lines need surrounding context
 - Do not escape quotes, newlines, or special characters`,
 			inputSchema: {
-				file_path: z
+				filePath: z
 					.string()
 					.describe('Absolute path to the file (not a directory). Must be a complete file path with extension.'),
-				old_text: z.string().optional().describe('Old text to replace (for edits)'),
-				new_text: z.string().optional().describe('New text (for edits)'),
+				oldText: z.string().optional().describe('Old text to replace (for edits)'),
+				newText: z.string().optional().describe('New text (for edits)'),
 				content: z.string().optional().describe('Full file content (for writes)'),
 			},
 			annotations: {
@@ -379,20 +379,20 @@ CRITICAL:
 - Prefer this tool over other multi-edit tools
 
 USAGE:
-- Provide array of edit operations with old_string/new_string pairs
+- Provide array of edit operations with oldString/newString pairs
 - Operations are applied sequentially to avoid position conflicts
-- Set replace_all: true to replace all occurrences of old_string
+- Set replaceAll: true to replace all occurrences of oldString
 - More efficient than multiple individual edit operations`,
 				inputSchema: {
-					file_path: z
+					filePath: z
 						.string()
 						.describe('Absolute path to the file (not a directory). Must be a complete file path with extension.'),
 					edits: z
 						.array(
 							z.object({
-								old_string: z.string().describe('Text to replace'),
-								new_string: z.string().describe('Text to replace it with'),
-								replace_all: z.boolean().optional().describe('Replace all occurrences of old_string (default false)'),
+								oldString: z.string().describe('Text to replace'),
+								newString: z.string().describe('Text to replace it with'),
+								replaceAll: z.boolean().optional().describe('Replace all occurrences of oldString (default false)'),
 							}),
 						)
 						.min(1)
@@ -426,7 +426,7 @@ USAGE:
 						};
 					}
 
-					const filePath = this.resolveFilePath(input.file_path);
+					const filePath = this.resolveFilePath(input.filePath);
 
 					this.logger.info(`MCP multi_edit: Processing ${input.edits.length} edits on ${filePath}`);
 
@@ -438,9 +438,9 @@ USAGE:
 					const { newContent, lineNumbers } = this.applyEditsWithLineNumbers(
 						content,
 						input.edits.map((edit) => ({
-							oldText: edit.old_string,
-							newText: edit.new_string,
-							replaceAll: edit.replace_all ?? false,
+							oldText: edit.oldString,
+							newText: edit.newString,
+							replaceAll: edit.replaceAll ?? false,
 						})),
 					);
 
@@ -780,30 +780,30 @@ USAGE:
 		// Handle different tool types with specific descriptive patterns
 		switch (toolName) {
 			case 'read_file':
-				if (inputObj.file_path) {
-					return `Read file: ${inputObj.file_path}`;
+				if (inputObj.filePath) {
+					return `Read file: ${inputObj.filePath}`;
 				}
 				break;
 
 			case 'edit_file':
 			case 'write_file':
-				if (inputObj.file_path) {
+				if (inputObj.filePath) {
 					const operation = inputObj.content ? 'Write to' : 'Edit';
-					return `${operation} file: ${inputObj.file_path}`;
+					return `${operation} file: ${inputObj.filePath}`;
 				}
 				break;
 
 			case 'multi_edit':
-				if (inputObj.file_path && inputObj.edits) {
+				if (inputObj.filePath && inputObj.edits) {
 					const count = Array.isArray(inputObj.edits) ? inputObj.edits.length : '?';
-					return `Apply ${count} edits to: ${inputObj.file_path}`;
+					return `Apply ${count} edits to: ${inputObj.filePath}`;
 				}
 				break;
 
 			default:
 				// For other tools, try to extract meaningful info from common parameters
-				if (inputObj.file_path) {
-					return `${toolName}: ${inputObj.file_path}`;
+				if (inputObj.filePath) {
+					return `${toolName}: ${inputObj.filePath}`;
 				}
 				if (inputObj.path) {
 					return `${toolName}: ${inputObj.path}`;

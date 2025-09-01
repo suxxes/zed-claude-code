@@ -347,8 +347,8 @@ describe('McpServerManager', () => {
 			readFileHandler = readFileCall?.[2];
 		});
 
-		it('should read file successfully with file_path parameter', async () => {
-			const input = { file_path: '/test/file.txt' };
+		it('should read file successfully with filePath parameter', async () => {
+			const input = { filePath: '/test/file.txt' };
 			mockAgent.readTextFile = vi.fn().mockResolvedValue({ content: 'file content' });
 
 			const result = await readFileHandler(input);
@@ -366,7 +366,7 @@ describe('McpServerManager', () => {
 		});
 
 		it('should handle offset and limit parameters', async () => {
-			const input = { file_path: '/test/file.txt', offset: 10, limit: 50 };
+			const input = { filePath: '/test/file.txt', offset: 10, limit: 50 };
 			mockAgent.readTextFile = vi.fn().mockResolvedValue({ content: 'file content' });
 
 			const _result = await readFileHandler(input);
@@ -391,7 +391,7 @@ describe('McpServerManager', () => {
 
 		it('should handle session not found', async () => {
 			mockSessionsManager.getSession.mockReturnValue(null);
-			const input = { file_path: '/test/file.txt' };
+			const input = { filePath: '/test/file.txt' };
 
 			const result = await readFileHandler(input);
 
@@ -401,7 +401,7 @@ describe('McpServerManager', () => {
 		});
 
 		it('should handle read file error', async () => {
-			const input = { file_path: '/test/file.txt' };
+			const input = { filePath: '/test/file.txt' };
 			const error = new Error('File not found');
 			mockAgent.readTextFile = vi.fn().mockRejectedValue(error);
 
@@ -425,7 +425,7 @@ describe('McpServerManager', () => {
 		});
 
 		it('should write new file content', async () => {
-			const input = { file_path: '/test/file.txt', content: 'new file content' };
+			const input = { filePath: '/test/file.txt', content: 'new file content' };
 			mockAgent.writeTextFile = vi.fn().mockResolvedValue({ success: true });
 
 			const result = await editFileHandler(input);
@@ -441,9 +441,9 @@ describe('McpServerManager', () => {
 
 		it('should edit existing file content', async () => {
 			const input = {
-				file_path: '/test/file.txt',
-				old_text: 'old content',
-				new_text: 'new content',
+				filePath: '/test/file.txt',
+				oldText: 'old content',
+				newText: 'new content',
 			};
 			mockAgent.readTextFile = vi.fn().mockResolvedValue({ content: 'file with old content here' });
 			mockAgent.writeTextFile = vi.fn().mockResolvedValue({ success: true });
@@ -472,7 +472,7 @@ describe('McpServerManager', () => {
 
 		it('should handle session not found', async () => {
 			mockSessionsManager.getSession.mockReturnValue(null);
-			const input = { file_path: '/test/file.txt', content: 'content' };
+			const input = { filePath: '/test/file.txt', content: 'content' };
 
 			const result = await editFileHandler(input);
 
@@ -482,7 +482,7 @@ describe('McpServerManager', () => {
 		});
 
 		it('should handle write error', async () => {
-			const input = { file_path: '/test/file.txt', content: 'content' };
+			const input = { filePath: '/test/file.txt', content: 'content' };
 			const error = new Error('Write failed');
 			mockAgent.writeTextFile = vi.fn().mockRejectedValue(error);
 
@@ -495,9 +495,9 @@ describe('McpServerManager', () => {
 
 		it('should handle read error during edit', async () => {
 			const input = {
-				file_path: '/test/file.txt',
-				old_text: 'old',
-				new_text: 'new',
+				filePath: '/test/file.txt',
+				oldText: 'old',
+				newText: 'new',
 			};
 			const error = new Error('Read failed');
 			mockAgent.readTextFile = vi.fn().mockRejectedValue(error);
@@ -523,10 +523,10 @@ describe('McpServerManager', () => {
 
 		it('should apply multiple edits successfully', async () => {
 			const input = {
-				file_path: '/test/file.txt',
+				filePath: '/test/file.txt',
 				edits: [
-					{ old_string: 'old1', new_string: 'new1' },
-					{ old_string: 'old2', new_string: 'new2', replace_all: true },
+					{ oldString: 'old1', newString: 'new1' },
+					{ oldString: 'old2', newString: 'new2', replaceAll: true },
 				],
 			};
 			mockAgent.readTextFile = vi.fn().mockResolvedValue({ content: 'original old1 content old2 and more old2' });
@@ -557,8 +557,8 @@ describe('McpServerManager', () => {
 		it('should handle session not found', async () => {
 			mockSessionsManager.getSession.mockReturnValue(null);
 			const input = {
-				file_path: '/test/file.txt',
-				edits: [{ old_string: 'old', new_string: 'new' }],
+				filePath: '/test/file.txt',
+				edits: [{ oldString: 'old', newString: 'new' }],
 			};
 
 			const result = await multiEditHandler(input);
@@ -570,8 +570,8 @@ describe('McpServerManager', () => {
 
 		it('should handle multi-edit error', async () => {
 			const input = {
-				file_path: '/test/file.txt',
-				edits: [{ old_string: 'old', new_string: 'new' }],
+				filePath: '/test/file.txt',
+				edits: [{ oldString: 'old', newString: 'new' }],
 			};
 			const error = new Error('Edit failed');
 			mockAgent.readTextFile = vi.fn().mockRejectedValue(error);
@@ -921,7 +921,7 @@ describe('McpServerManager', () => {
 			mockAgent.readTextFile = vi.fn().mockResolvedValue({ content: 'content' });
 
 			// Test absolute path
-			await readFileHandler({ file_path: '/absolute/path/file.txt' });
+			await readFileHandler({ filePath: '/absolute/path/file.txt' });
 			expect(mockAgent.readTextFile).toHaveBeenLastCalledWith({
 				sessionId,
 				path: '/absolute/path/file.txt',
@@ -930,7 +930,7 @@ describe('McpServerManager', () => {
 			});
 
 			// Test relative path (should be resolved to absolute path)
-			await readFileHandler({ file_path: 'relative/path/file.txt' });
+			await readFileHandler({ filePath: 'relative/path/file.txt' });
 			expect(mockAgent.readTextFile).toHaveBeenLastCalledWith({
 				sessionId,
 				path: `${process.cwd()}/relative/path/file.txt`,
@@ -939,7 +939,7 @@ describe('McpServerManager', () => {
 			});
 
 			// Test path with spaces
-			await readFileHandler({ file_path: '/path with spaces/file.txt' });
+			await readFileHandler({ filePath: '/path with spaces/file.txt' });
 			expect(mockAgent.readTextFile).toHaveBeenLastCalledWith({
 				sessionId,
 				path: '/path with spaces/file.txt',
@@ -959,7 +959,7 @@ describe('McpServerManager', () => {
 
 			// Test with empty edits array (should be prevented by schema, but test defensive handling)
 			const input = {
-				file_path: '/test/file.txt',
+				filePath: '/test/file.txt',
 				edits: [],
 			};
 
