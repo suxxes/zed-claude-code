@@ -37,7 +37,7 @@ describe('SearchToolsHandler', () => {
 				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
-					title: 'Find /project/src **/*.ts',
+					title: 'find /project/src **/*.ts',
 					kind: 'search',
 					content: [],
 					locations: [{ path: '/project/src' }],
@@ -56,7 +56,7 @@ describe('SearchToolsHandler', () => {
 				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
-					title: 'Find *.js',
+					title: 'find *.js',
 					kind: 'search',
 					content: [],
 					locations: [],
@@ -76,7 +76,7 @@ describe('SearchToolsHandler', () => {
 				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
-					title: 'Find /project/test',
+					title: 'find /project/test',
 					kind: 'search',
 					content: [],
 					locations: [{ path: '/project/test' }],
@@ -95,7 +95,7 @@ describe('SearchToolsHandler', () => {
 				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
-					title: 'Find',
+					title: 'find',
 					kind: 'search',
 					content: [],
 					locations: [],
@@ -115,7 +115,7 @@ describe('SearchToolsHandler', () => {
 				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
-					title: 'Find /workspace src/**/*.{ts,tsx,js,jsx}',
+					title: 'find /workspace src/**/*.{ts,tsx,js,jsx}',
 					kind: 'search',
 					content: [],
 					locations: [{ path: '/workspace' }],
@@ -417,7 +417,7 @@ describe('SearchToolsHandler', () => {
 				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
-					title: "List the `/project/src/components` directory's contents",
+					title: 'ls `/project/src/components`',
 					kind: 'search',
 					content: [],
 					locations: [],
@@ -434,7 +434,7 @@ describe('SearchToolsHandler', () => {
 				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
-					title: "List the current directory's contents",
+					title: 'ls',
 					kind: 'search',
 					content: [],
 					locations: [],
@@ -453,7 +453,7 @@ describe('SearchToolsHandler', () => {
 				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
-					title: "List the current directory's contents",
+					title: 'ls',
 					kind: 'search',
 					content: [],
 					locations: [],
@@ -472,7 +472,7 @@ describe('SearchToolsHandler', () => {
 				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
-					title: "List the current directory's contents",
+					title: 'ls',
 					kind: 'search',
 					content: [],
 					locations: [],
@@ -491,7 +491,7 @@ describe('SearchToolsHandler', () => {
 				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
-					title: "List the `/home/user/projects/my-app/src/utils` directory's contents",
+					title: 'ls `/home/user/projects/my-app/src/utils`',
 					kind: 'search',
 					content: [],
 					locations: [],
@@ -872,7 +872,7 @@ describe('SearchToolsHandler', () => {
 			};
 
 			const toolInfo = handler.getToolInfo(toolUse);
-			expect(toolInfo.title).toBe('Find /project/src **/*.test.ts');
+			expect(toolInfo.title).toBe('find /project/src **/*.test.ts');
 			expect(toolInfo.kind).toBe('search');
 
 			// Step 2: Process search results
@@ -929,7 +929,7 @@ describe('SearchToolsHandler', () => {
 			};
 
 			const toolInfo = handler.getToolInfo(toolUse);
-			expect(toolInfo.title).toBe("List the `/project/src/components` directory's contents");
+			expect(toolInfo.title).toBe('ls `/project/src/components`');
 			expect(toolInfo.kind).toBe('search');
 
 			// Step 2: Process directory listing results
@@ -997,7 +997,7 @@ describe('SearchToolsHandler', () => {
 
 			const result = handler.getToolInfo(toolUse);
 
-			expect(result.title).toBe('Find');
+			expect(result.title).toBe('find');
 			expect(result.locations).toEqual([]);
 		});
 	});

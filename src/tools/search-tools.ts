@@ -84,7 +84,7 @@ export class SearchToolsHandler implements ToolHandler {
 	 * Handle Glob search operations
 	 */
 	protected handleGlobTool(input: GlobInput): ToolInfo {
-		let label = 'Find';
+		let label = 'find';
 		if (input.path) label += ` ${input.path}`;
 		if (input.pattern) label += ` ${input.pattern}`;
 
@@ -143,7 +143,7 @@ export class SearchToolsHandler implements ToolHandler {
 	 */
 	protected handleLsTool(input: LsInput): ToolInfo {
 		return {
-			title: `List the ${input?.path ? `\`${input.path}\`` : 'current'} directory's contents`,
+			title: input?.path ? `ls \`${input.path}\`` : 'ls',
 			kind: 'search',
 			content: [],
 			locations: [],

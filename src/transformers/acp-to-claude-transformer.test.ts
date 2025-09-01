@@ -161,7 +161,7 @@ describe('AcpToClaudeTransformer', () => {
 
 				expect(result.message.content[0]).toEqual({
 					type: 'text',
-					text: '[@file.txt](file:///path/to/file.txt)',
+					text: '[file.txt](file:///path/to/file.txt)',
 				});
 			});
 
@@ -180,7 +180,7 @@ describe('AcpToClaudeTransformer', () => {
 
 				expect(result.message.content[0]).toEqual({
 					type: 'text',
-					text: '[@main.ts](zed://project/src/main.ts)',
+					text: '[main.ts](zed://project/src/main.ts)',
 				});
 			});
 
@@ -218,7 +218,7 @@ describe('AcpToClaudeTransformer', () => {
 
 				expect(result.message.content[0]).toEqual({
 					type: 'text',
-					text: '[@](file://)',
+					text: '[](file://)',
 				});
 			});
 
@@ -237,7 +237,7 @@ describe('AcpToClaudeTransformer', () => {
 
 				expect(result.message.content[0]).toEqual({
 					type: 'text',
-					text: '[@/path/to/](file:///path/to/)',
+					text: '[/path/to/](file:///path/to/)',
 				});
 			});
 		});
@@ -262,7 +262,7 @@ describe('AcpToClaudeTransformer', () => {
 				expect(result.message.content).toHaveLength(2);
 				expect(result.message.content[0]).toEqual({
 					type: 'text',
-					text: '[@code.ts](file:///path/to/code.ts)',
+					text: '[code.ts](file:///path/to/code.ts)',
 				});
 				expect(result.message.content[1]).toEqual({
 					type: 'text',
@@ -562,11 +562,11 @@ describe('AcpToClaudeTransformer', () => {
 				});
 				expect(result.message.content[1]).toEqual({
 					type: 'text',
-					text: '[@code.ts](file:///code.ts)',
+					text: '[code.ts](file:///code.ts)',
 				});
 				expect(result.message.content[2]).toEqual({
 					type: 'text',
-					text: '[@example.js](file:///example.js)',
+					text: '[example.js](file:///example.js)',
 				});
 				expect(result.message.content[3]).toEqual({
 					type: 'image',
@@ -615,11 +615,11 @@ describe('AcpToClaudeTransformer', () => {
 
 				expect(result.message.content).toHaveLength(5);
 				// First resource link
-				expect(result.message.content[0].text).toBe('[@first.js](file:///first.js)');
+				expect(result.message.content[0].text).toBe('[first.js](file:///first.js)');
 				// Text content
 				expect(result.message.content[1].text).toBe('Some text');
 				// Second resource link
-				expect(result.message.content[2].text).toBe('[@second.js](file:///second.js)');
+				expect(result.message.content[2].text).toBe('[second.js](file:///second.js)');
 				// First context
 				expect(result.message.content[3].text).toContain('first content');
 				// Second context
@@ -796,85 +796,6 @@ describe('AcpToClaudeTransformer', () => {
 		});
 	});
 
-	describe('formatUriAsLink', () => {
-		it('should format file:// URI with filename', () => {
-			const result = (transformer as any).formatUriAsLink('file:///home/user/document.pdf');
-			expect(result).toBe('[@document.pdf](file:///home/user/document.pdf)');
-		});
-
-		it('should format zed:// URI with filename', () => {
-			const result = (transformer as any).formatUriAsLink('zed://workspace/src/index.ts');
-			expect(result).toBe('[@index.ts](zed://workspace/src/index.ts)');
-		});
-
-		it('should handle file:// URI without filename', () => {
-			const result = (transformer as any).formatUriAsLink('file:///home/user/');
-			expect(result).toBe('[@/home/user/](file:///home/user/)');
-		});
-
-		it('should handle zed:// URI without filename', () => {
-			const result = (transformer as any).formatUriAsLink('zed://workspace/');
-			expect(result).toBe('[@zed://workspace/](zed://workspace/)');
-		});
-
-		it('should pass through non-file/zed URIs unchanged', () => {
-			const httpUri = 'https://example.com/resource';
-			const result = (transformer as any).formatUriAsLink(httpUri);
-			expect(result).toBe(httpUri);
-		});
-
-		it('should handle URIs with complex paths', () => {
-			const result = (transformer as any).formatUriAsLink('file:///very/deep/nested/path/to/file.json');
-			expect(result).toBe('[@file.json](file:///very/deep/nested/path/to/file.json)');
-		});
-
-		it('should handle URIs with special characters in filename', () => {
-			const result = (transformer as any).formatUriAsLink('file:///path/my-file_v2.0.ts');
-			expect(result).toBe('[@my-file_v2.0.ts](file:///path/my-file_v2.0.ts)');
-		});
-
-		it('should handle URIs with query parameters', () => {
-			const result = (transformer as any).formatUriAsLink('https://example.com/file.js?version=1');
-			expect(result).toBe('https://example.com/file.js?version=1');
-		});
-
-		it('should handle malformed URIs gracefully', () => {
-			// Test with various malformed URIs to ensure no crashes
-			expect((transformer as any).formatUriAsLink('file://')).toBe('[@](file://)');
-			expect((transformer as any).formatUriAsLink('zed://')).toBe('[@zed://](zed://)');
-			expect((transformer as any).formatUriAsLink('')).toBe('');
-			expect((transformer as any).formatUriAsLink('not-a-uri')).toBe('not-a-uri');
-		});
-
-		it('should handle URIs that might throw exceptions', () => {
-			// Mock a scenario where URI processing might fail
-			const originalSplit = String.prototype.split;
-			vi.spyOn(String.prototype, 'split').mockImplementationOnce(() => {
-				throw new Error('Split failed');
-			});
-
-			const result = (transformer as any).formatUriAsLink('file:///path/file.txt');
-			expect(result).toBe('file:///path/file.txt');
-
-			// Restore original method
-			String.prototype.split = originalSplit;
-		});
-
-		it('should handle extremely long URIs', () => {
-			const longPath = 'a'.repeat(1000);
-			const longFilename = 'b'.repeat(500);
-			const uri = `file:///${longPath}/${longFilename}.txt`;
-
-			const result = (transformer as any).formatUriAsLink(uri);
-			expect(result).toBe(`[@${longFilename}.txt](${uri})`);
-		});
-
-		it('should handle URIs with Unicode characters', () => {
-			const result = (transformer as any).formatUriAsLink('file:///path/файл.txt');
-			expect(result).toBe('[@файл.txt](file:///path/файл.txt)');
-		});
-	});
-
 	describe('edge cases and error handling', () => {
 		it('should handle null or undefined prompt chunks gracefully', () => {
 			const prompt: PromptRequest = {
@@ -966,7 +887,7 @@ describe('AcpToClaudeTransformer', () => {
 			expect(result.message.content).toHaveLength(3);
 			expect(result.message.content[0].text).toBe('Valid text 1');
 			expect(result.message.content[1].text).toBe('Valid text 2');
-			expect(result.message.content[2].text).toBe('[@path.txt](file:///valid/path.txt)');
+			expect(result.message.content[2].text).toBe('[path.txt](file:///valid/path.txt)');
 		});
 	});
 

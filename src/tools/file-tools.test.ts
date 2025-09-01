@@ -37,7 +37,7 @@ describe('FileToolsHandler', () => {
 				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
-					title: 'Read /test/file.txt',
+					title: '[file.txt](file:///test/file.txt)',
 					kind: 'read',
 					locations: [
 						{
@@ -61,7 +61,7 @@ describe('FileToolsHandler', () => {
 				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
-					title: 'Read /test/mcp-file.txt',
+					title: '[mcp-file.txt](file:///test/mcp-file.txt)',
 					kind: 'read',
 					locations: [
 						{
@@ -87,7 +87,7 @@ describe('FileToolsHandler', () => {
 				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
-					title: 'Read /test/file.txt (11 - 30)',
+					title: '[file.txt](file:///test/file.txt) (11–30)',
 					kind: 'read',
 					locations: [
 						{
@@ -112,7 +112,7 @@ describe('FileToolsHandler', () => {
 				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
-					title: 'Read /test/file.txt (from line 6)',
+					title: '[file.txt](file:///test/file.txt) (6+)',
 					kind: 'read',
 					locations: [
 						{
@@ -134,7 +134,7 @@ describe('FileToolsHandler', () => {
 				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
-					title: 'Read File',
+					title: '',
 					kind: 'read',
 					locations: [],
 					content: [],
@@ -156,7 +156,7 @@ describe('FileToolsHandler', () => {
 				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
-					title: 'Write /test/new-file.txt',
+					title: '[new-file.txt](file:///test/new-file.txt)',
 					kind: 'edit',
 					content: [
 						{
@@ -183,7 +183,7 @@ describe('FileToolsHandler', () => {
 				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
-					title: 'Write /test/mcp-new-file.txt',
+					title: '[mcp-new-file.txt](file:///test/mcp-new-file.txt)',
 					kind: 'edit',
 					content: [
 						{
@@ -211,7 +211,7 @@ describe('FileToolsHandler', () => {
 				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
-					title: 'Edit /test/edit-file.txt',
+					title: '[edit-file.txt](file:///test/edit-file.txt)',
 					kind: 'edit',
 					content: [
 						{
@@ -238,7 +238,7 @@ describe('FileToolsHandler', () => {
 				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
-					title: 'Edit',
+					title: '',
 					kind: 'edit',
 					content: [],
 					locations: [],
@@ -263,7 +263,7 @@ describe('FileToolsHandler', () => {
 				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
-					title: 'Edit /test/multi_edit-file.txt',
+					title: '[multi_edit-file.txt](file:///test/multi_edit-file.txt)',
 					kind: 'edit',
 					content: [
 						{
@@ -296,7 +296,7 @@ describe('FileToolsHandler', () => {
 				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
-					title: 'Edit',
+					title: '',
 					kind: 'edit',
 					content: [
 						{

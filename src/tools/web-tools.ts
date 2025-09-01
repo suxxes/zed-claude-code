@@ -69,7 +69,7 @@ export class WebToolsHandler implements ToolHandler {
 	 */
 	protected handleWebFetchTool(input: WebFetchInput): ToolInfo {
 		return {
-			title: input?.url ? `Fetch ${input.url}` : 'Fetch',
+			title: input.url,
 			kind: 'fetch',
 			content: input?.prompt
 				? [
@@ -86,7 +86,7 @@ export class WebToolsHandler implements ToolHandler {
 	 * Handle web search operations
 	 */
 	protected handleWebSearchTool(input: WebSearchInput): ToolInfo {
-		let label = `"${input.query}"`;
+		let label = `Searching the web: ${input.query}`;
 
 		if (input.allowedDomains && input.allowedDomains.length > 0) {
 			label += ` (allowed: ${input.allowedDomains.join(', ')})`;
@@ -99,7 +99,12 @@ export class WebToolsHandler implements ToolHandler {
 		return {
 			title: label,
 			kind: 'fetch',
-			content: [],
+			content: [
+				{
+					type: 'content',
+					content: { type: 'text', text: input.query },
+				},
+			],
 		};
 	}
 }

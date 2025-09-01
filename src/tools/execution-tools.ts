@@ -85,7 +85,7 @@ export class ExecutionToolsHandler implements ToolHandler {
 	 */
 	protected handleBashTool(input: BashInput): ToolInfo {
 		return {
-			title: input?.command ? `\`${input.command.replaceAll('`', '\\`')}\`` : 'Terminal',
+			title: input?.command ? input.command : 'bash',
 			kind: 'execute',
 			content: input?.description
 				? [
@@ -103,7 +103,7 @@ export class ExecutionToolsHandler implements ToolHandler {
 	 */
 	protected handleBashOutputTool(_input: BashOutputInput): ToolInfo {
 		return {
-			title: 'Tail Logs',
+			title: 'tail',
 			kind: 'execute',
 			content: [],
 		};
@@ -114,7 +114,7 @@ export class ExecutionToolsHandler implements ToolHandler {
 	 */
 	protected handleKillBashTool(_input: KillBashInput): ToolInfo {
 		return {
-			title: 'Kill Process',
+			title: 'kill',
 			kind: 'execute',
 			content: [],
 		};
@@ -125,7 +125,7 @@ export class ExecutionToolsHandler implements ToolHandler {
 	 */
 	protected handleTaskTool(input: TaskInput): ToolInfo {
 		return {
-			title: input?.description ? input.description : 'Task',
+			title: input?.description ? input.description : 'task',
 			kind: 'think',
 			content: input?.prompt
 				? [

@@ -1,5 +1,6 @@
 import type { SDKUserMessage } from '@anthropic-ai/claude-code';
 import type { PromptRequest } from '@zed-industries/agent-client-protocol';
+import formatUriAsLink from '../utils/string';
 import type { MessageTransformer } from './message-transformer';
 
 /**
@@ -20,7 +21,7 @@ export class AcpToClaudeTransformer implements MessageTransformer<PromptRequest,
 					break;
 
 				case 'resource_link': {
-					const formattedUri = this.formatUriAsLink(chunk.uri);
+					const formattedUri = formatUriAsLink(chunk.uri);
 					content.push({
 						type: 'text',
 						text: formattedUri,
@@ -30,7 +31,7 @@ export class AcpToClaudeTransformer implements MessageTransformer<PromptRequest,
 
 				case 'resource': {
 					if ('text' in chunk.resource) {
-						const formattedUri = this.formatUriAsLink(chunk.resource.uri);
+						const formattedUri = formatUriAsLink(chunk.resource.uri);
 						content.push({
 							type: 'text',
 							text: formattedUri,
@@ -80,42 +81,5 @@ export class AcpToClaudeTransformer implements MessageTransformer<PromptRequest,
 			session_id: prompt.sessionId,
 			parent_tool_use_id: null,
 		};
-	}
-
-	protected formatUriAsLink(uri: string): string {
-		try {
-			const url = new URL(uri);
-
-			if (url.protocol === 'file:') {
-				// For file:// URLs, decode pathname for Unicode support
-				const pathname = decodeURIComponent(url.pathname);
-
-				// If it ends with / it's a directory, show the full path
-				if (uri.endsWith('/') && pathname !== '/') {
-					return `[@${pathname}](${uri})`;
-				}
-
-				// Otherwise extract the filename
-				const segments = pathname.split('/').filter(Boolean);
-				const name = segments.length > 0 ? segments[segments.length - 1] : '';
-
-				return `[@${name}](${uri})`;
-			}
-
-			if (url.protocol === 'zed:') {
-				// For zed:// URLs, extract the last path segment
-				const pathname = decodeURIComponent(url.pathname);
-				const segments = pathname.split('/').filter(Boolean);
-				const name = segments.length > 0 ? segments[segments.length - 1] : uri;
-
-				return `[@${name}](${uri})`;
-			}
-
-			// For other protocols, return as-is
-			return uri;
-		} catch {
-			// If not a valid URL, return as-is
-			return uri;
-		}
 	}
 }

@@ -1,4 +1,5 @@
 import type { ClaudeToolResult, McpToolResult, ToolHandler, ToolInfo, ToolUpdate } from '../managers/tools-manager';
+import formatUriAsLink from '../utils/string';
 
 // File operation types (used by file tools handlers)
 export interface ReadFileInput {
@@ -88,16 +89,19 @@ export class FileToolsHandler implements ToolHandler {
 	 * Handle file read operations
 	 */
 	protected handleReadTool(input: ReadFileInput): ToolInfo {
-		let limit = '';
+		let title = input.filePath ? formatUriAsLink(`file://${input.filePath}`) : '';
 
-		if (input.limit) {
-			limit = ` (${(input.offset ?? 0) + 1} - ${(input.offset ?? 0) + input.limit})`;
-		} else if (input.offset) {
-			limit = ` (from line ${input.offset + 1})`;
+		// Add offset/limit information to title if present
+		if (input.filePath && input.offset !== undefined && input.limit !== undefined) {
+			const start = input.offset + 1;
+			const end = input.offset + input.limit;
+			title += ` (${start}–${end})`;
+		} else if (input.filePath && input.offset !== undefined) {
+			title += ` (${input.offset + 1}+)`;
 		}
 
 		return {
-			title: `Read ${input.filePath ?? 'File'}${limit}`,
+			title,
 			kind: 'read',
 			locations: input.filePath
 				? [
@@ -118,7 +122,7 @@ export class FileToolsHandler implements ToolHandler {
 		// Handle write operation (content provided)
 		if (input.content && !input.oldText) {
 			return {
-				title: input.filePath ? `Write ${input.filePath}` : 'Write',
+				title: input.filePath ? formatUriAsLink(`file://${input.filePath}`) : '',
 				kind: 'edit',
 				content: input.filePath
 					? [
@@ -135,7 +139,7 @@ export class FileToolsHandler implements ToolHandler {
 		}
 
 		return {
-			title: input.filePath ? `Edit ${input.filePath}` : 'Edit',
+			title: input.filePath ? formatUriAsLink(`file://${input.filePath}`) : '',
 			kind: 'edit',
 			content: input.filePath
 				? [
@@ -156,7 +160,7 @@ export class FileToolsHandler implements ToolHandler {
 	 */
 	protected handleMultiEditTool(input: MultiEditInput): ToolInfo {
 		return {
-			title: input?.filePath ? `Edit ${input.filePath}` : 'Edit',
+			title: input.filePath ? formatUriAsLink(`file://${input.filePath}`) : '',
 			kind: 'edit',
 			content: input.edits.reduce(
 				(content, edit) => {

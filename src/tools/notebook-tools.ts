@@ -1,4 +1,5 @@
 import type { ClaudeToolResult, McpToolResult, ToolHandler, ToolInfo, ToolUpdate } from '../managers/tools-manager';
+import formatUriAsLink from '../utils/string';
 
 // Notebook operation types
 export interface NotebookReadInput {
@@ -67,7 +68,7 @@ export class NotebookToolsHandler implements ToolHandler {
 	 */
 	protected handleNotebookReadTool(input: NotebookReadInput): ToolInfo {
 		return {
-			title: input?.notebook_path ? `Read Jupyter Notebook ${input.notebook_path}` : 'Read Jupyter Notebook',
+			title: input?.notebook_path ? formatUriAsLink(`file://${input.notebook_path}`) : '',
 			kind: 'read',
 			content: [],
 			locations: input?.notebook_path ? [{ path: input.notebook_path }] : [],
@@ -79,7 +80,7 @@ export class NotebookToolsHandler implements ToolHandler {
 	 */
 	protected handleNotebookEditTool(input: NotebookEditInput): ToolInfo {
 		return {
-			title: input?.notebook_path ? `Edit Jupyter Notebook ${input.notebook_path}` : 'Edit Jupyter Notebook',
+			title: input?.notebook_path ? formatUriAsLink(`file://${input.notebook_path}`) : '',
 			kind: 'edit',
 			content: input?.new_source
 				? [

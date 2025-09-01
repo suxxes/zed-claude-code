@@ -80,7 +80,7 @@ export class PlanningToolsHandler implements ToolHandler {
 	 */
 	protected handleTodoWriteTool(input: TodoWriteInput): ToolInfo {
 		return {
-			title: input?.todos ? `Update TODOs: ${input.todos.map((todo) => todo.content).join(', ')}` : 'Update TODOs',
+			title: input?.todos ? `Update TODOs: ${input.todos.map((todo) => todo.content).join(', ')}` : 'Update TODO',
 			kind: 'think',
 			content: [],
 		};

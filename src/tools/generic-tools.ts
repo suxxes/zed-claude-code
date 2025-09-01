@@ -54,7 +54,7 @@ export class GenericToolsHandler implements ToolHandler {
 	 */
 	protected handleOtherTool(name: string, input: unknown): ToolInfo {
 		return {
-			title: name || 'Unknown Tool',
+			title: name || 'unknown',
 			kind: 'other',
 			content: [
 				{
@@ -73,7 +73,7 @@ export class GenericToolsHandler implements ToolHandler {
 	 */
 	protected handleUnknownTool(name: string, input?: unknown): ToolInfo {
 		return {
-			title: name || 'Unknown Tool',
+			title: name || 'unknown',
 			kind: 'other',
 			content: input
 				? [

@@ -37,7 +37,7 @@ describe('ExecutionToolsHandler', () => {
 				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
-					title: '`ls -la`',
+					title: 'ls -la',
 					kind: 'execute',
 					content: [
 						{
@@ -60,7 +60,7 @@ describe('ExecutionToolsHandler', () => {
 				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
-					title: '`npm install`',
+					title: 'npm install',
 					kind: 'execute',
 					content: [],
 				});
@@ -79,7 +79,7 @@ describe('ExecutionToolsHandler', () => {
 				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
-					title: 'Terminal',
+					title: 'bash',
 					kind: 'execute',
 					content: [
 						{
@@ -102,7 +102,7 @@ describe('ExecutionToolsHandler', () => {
 				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
-					title: '`echo \\`date\\``',
+					title: 'echo `date`',
 					kind: 'execute',
 					content: [],
 				});
@@ -120,7 +120,7 @@ describe('ExecutionToolsHandler', () => {
 				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
-					title: '`echo \\`pwd\\` && ls \\`dirname $0\\``',
+					title: 'echo `pwd` && ls `dirname $0`',
 					kind: 'execute',
 					content: [],
 				});
@@ -139,7 +139,7 @@ describe('ExecutionToolsHandler', () => {
 				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
-					title: 'Terminal',
+					title: 'bash',
 					kind: 'execute',
 					content: [],
 				});
@@ -157,7 +157,7 @@ describe('ExecutionToolsHandler', () => {
 				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
-					title: 'Tail Logs',
+					title: 'tail',
 					kind: 'execute',
 					content: [],
 				});
@@ -173,7 +173,7 @@ describe('ExecutionToolsHandler', () => {
 				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
-					title: 'Tail Logs',
+					title: 'tail',
 					kind: 'execute',
 					content: [],
 				});
@@ -191,7 +191,7 @@ describe('ExecutionToolsHandler', () => {
 				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
-					title: 'Kill Process',
+					title: 'kill',
 					kind: 'execute',
 					content: [],
 				});
@@ -207,7 +207,7 @@ describe('ExecutionToolsHandler', () => {
 				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
-					title: 'Kill Process',
+					title: 'kill',
 					kind: 'execute',
 					content: [],
 				});
@@ -269,7 +269,7 @@ describe('ExecutionToolsHandler', () => {
 				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
-					title: 'Task',
+					title: 'task',
 					kind: 'think',
 					content: [
 						{
@@ -290,7 +290,7 @@ describe('ExecutionToolsHandler', () => {
 				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
-					title: 'Task',
+					title: 'task',
 					kind: 'think',
 					content: [],
 				});
@@ -309,7 +309,7 @@ describe('ExecutionToolsHandler', () => {
 				const result = handler.getToolInfo(toolUse);
 
 				expect(result).toEqual({
-					title: 'Task',
+					title: 'task',
 					kind: 'think',
 					content: [],
 				});
@@ -622,7 +622,7 @@ describe('ExecutionToolsHandler', () => {
 			};
 
 			const toolInfo = handler.getToolInfo(toolUse);
-			expect(toolInfo.title).toBe('`npm test`');
+			expect(toolInfo.title).toBe('npm test');
 			expect(toolInfo.kind).toBe('execute');
 
 			// Step 2: Process command result
