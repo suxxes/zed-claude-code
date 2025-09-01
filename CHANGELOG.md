@@ -5,6 +5,20 @@ All notable changes to Zed Claude Code will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2025-09-01
+
+### Fixed
+- Fixed critical text corruption bug in multi-edit operations where edits were applied to progressively modified content instead of original content
+- Corrected line number calculation in multi-edit to properly return 1-indexed line numbers
+- Removed CacheManager to avoid file caching issues, moved tools cache into ToolsManager for better separation of concerns
+- Corrected error to string conversion to avoid [Object Object] appearing in logs
+- Fixed tools usage and reporting for file operations to ensure proper tracking
+
+### Refactored
+- Converted snake_case tool variables to camelCase to improve code quality persistence and consistency
+- Cleaned up unused code and improved escape sequence logic for better maintainability
+- Improved error message clarity for missing sessions
+
 ## [1.0.4] - 2025-08-31
 
 ### Fixed
