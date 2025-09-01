@@ -5,6 +5,16 @@ All notable changes to Zed Claude Code will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.1] - 2025-09-01
+
+### Refactored
+- Extracted URI formatting logic to shared utility function for better code reuse
+- Added comprehensive test coverage for new formatUriAsLink utility function
+- Improved consistency in tool title formatting across the codebase
+- Simplified tool titles across all handlers (removed backticks, use lowercase)
+- Implemented clickable file links in file and notebook tools for improved navigation
+- Updated WebSearch tool to include search query in content field
+
 ## [1.1.0] - 2025-09-01
 
 ### Fixed
