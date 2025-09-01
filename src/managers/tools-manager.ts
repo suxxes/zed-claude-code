@@ -132,7 +132,6 @@ export class ToolsManager {
 	 * Get tool info from tool use by routing to appropriate handler
 	 */
 	getToolInfoFromToolUse(toolUse: AnyToolUse, cachedFileContent: Map<string, string>): ToolInfo {
-		const _name = toolUse.name;
 		this.logger.debug(`Getting tool info for: ${toolUse.name} (${toolUse.id})`);
 
 		try {

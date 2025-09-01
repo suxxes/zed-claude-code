@@ -108,7 +108,6 @@ export class SessionsManager {
 				pathToClaudeCodeExecutable: dependencyManager.ensureClaudeExecutable(),
 				// Configure token limits to prevent max_tokens < thinking.budget_tokens error
 				maxThinkingTokens: 16000, // Set thinking budget within reasonable limits
-				continue: true,
 			};
 
 			// Configure tool access based on client capabilities

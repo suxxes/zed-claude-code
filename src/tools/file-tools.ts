@@ -303,8 +303,8 @@ export class FileToolsHandler implements ToolHandler {
 		let escapeSequence = '```';
 
 		for (const [m] of text.matchAll(/^```+/gm)) {
-			while (m.length >= escapeSequence.length) {
-				escapeSequence += '`';
+			if (m.length >= escapeSequence.length) {
+				escapeSequence = '`'.repeat(m.length + 1);
 			}
 		}
 
