@@ -582,6 +582,57 @@ describe('McpServerManager', () => {
 				content: [{ type: 'text', text: 'Multi-edit failed: Edit failed' }],
 			});
 		});
+
+		it('should apply multiple edits correctly without text corruption', async () => {
+			// This test verifies the fix for the bug where edits were applied to modified content
+			// instead of the original content, causing text corruption
+			const originalContent = `This is a demo file for MCP tools.
+Line 2: Testing read functionality.
+Line 3: This will be edited.
+Line 4: Another line to modify.
+Line 5: Final line for demonstration.`;
+
+			mockAgent.readTextFile = vi.fn().mockResolvedValue({ content: originalContent });
+			mockAgent.writeTextFile = vi.fn().mockResolvedValue({ success: true });
+
+			const input = {
+				filePath: '/test/demo.txt',
+				edits: [
+					{
+						oldString: 'Line 2: Testing read functionality.',
+						newString: 'Line 2: Multi-edit change #1 applied!',
+						replaceAll: false,
+					},
+					{
+						oldString: 'Line 4: Another line to modify.',
+						newString: 'Line 4: Multi-edit change #2 applied!',
+						replaceAll: false,
+					},
+					{
+						oldString: 'Line 5: Final line for demonstration.',
+						newString: 'Line 5: All MCP tool operations completed successfully!',
+						replaceAll: false,
+					},
+				],
+			};
+
+			const result = await multiEditHandler(input);
+
+			// Verify the write was called with correct content
+			expect(mockAgent.writeTextFile).toHaveBeenCalledWith({
+				sessionId: 'test-session-123',
+				path: '/test/demo.txt',
+				content: `This is a demo file for MCP tools.
+Line 2: Multi-edit change #1 applied!
+Line 3: This will be edited.
+Line 4: Multi-edit change #2 applied!
+Line 5: All MCP tool operations completed successfully!`,
+			});
+
+			// Verify the response contains line numbers
+			const responseData = JSON.parse(result.content[0].text);
+			expect(responseData.lineNumbers).toEqual([2, 4, 5]);
+		});
 	});
 
 	describe('permission_request tool', () => {

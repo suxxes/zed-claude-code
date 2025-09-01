@@ -690,7 +690,7 @@ USAGE:
 	): Array<{ pos: number; len: number; text: string }> {
 		const replacements: Array<{ pos: number; len: number; text: string }> = [];
 
-		let content = fileContent;
+		const content = fileContent;
 
 		for (const edit of edits) {
 			if (!edit.oldText) continue;
@@ -718,10 +718,9 @@ USAGE:
 				}
 			}
 
-			// Apply replacements in reverse order to avoid position shifts
-			for (const pos of positions.reverse()) {
+			// Collect all replacements without modifying content
+			for (const pos of positions) {
 				replacements.push({ pos, len: edit.oldText.length, text: edit.newText });
-				content = content.slice(0, pos) + edit.newText + content.slice(pos + edit.oldText.length);
 			}
 		}
 
@@ -757,8 +756,8 @@ USAGE:
 			result = result.slice(0, pos) + text + result.slice(pos + len);
 		}
 
-		// Calculate unique affected line numbers using binary search
-		const lines = [...new Set(replacements.map((r) => this.getLineNumberBinarySearch(r.pos, lineStarts)))].sort(
+		// Calculate unique affected line numbers using binary search (convert to 1-indexed)
+		const lines = [...new Set(replacements.map((r) => this.getLineNumberBinarySearch(r.pos, lineStarts) + 1))].sort(
 			(a, b) => a - b,
 		);
 
