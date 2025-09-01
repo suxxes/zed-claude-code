@@ -88,12 +88,19 @@ For more information on configuring external agents in Zed, see the [Zed Externa
 5. Tool result flows back through MCP → SDK → ACP chain
 6. Results include location information and diff data
 
+### Conversation Management
+1. Session maintains conversation history across messages
+2. Query object per session enables interruption and streaming
+3. Context preserved for follow-up messages
+4. Proper handling of assistant and user message flows
+
 ## Key Features
 
 ### 🔄 **Protocol Translation**
 - **ACP ↔ Claude SDK**: Message format conversion
 - **Snake_case ↔ CamelCase**: External API compatibility with internal code quality
 - **Tool Metadata**: Rich UI information for tool calls
+- **URL-based URI Parsing**: Robust handling of file:// and zed:// protocols with Unicode support
 
 ### 🛠️ **Tool Integration** 
 - **File Operations**: Read, write, edit with diff visualization
@@ -104,8 +111,10 @@ For more information on configuring external agents in Zed, see the [Zed Externa
 ### 🏗️ **Architecture Benefits**
 - **Map-based Storage**: O(1) session lookup performance
 - **Modular Design**: Separation of concerns across components
-- **Type Safety**: Full TypeScript implementation
+- **Type Safety**: Full TypeScript implementation with strict checking
 - **Error Handling**: Comprehensive error propagation and logging
+- **Session Query Management**: Per-session query objects with interrupt capability
+- **Test Coverage**: 523 comprehensive unit tests ensuring reliability
 
 ## Development
 
