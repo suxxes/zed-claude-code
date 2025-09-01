@@ -396,7 +396,7 @@ describe('McpServerManager', () => {
 			const result = await readFileHandler(input);
 
 			expect(result).toEqual({
-				content: [{ type: 'text', text: 'The user has left the building' }],
+				content: [{ type: 'text', text: 'No session found' }],
 			});
 		});
 
@@ -477,7 +477,7 @@ describe('McpServerManager', () => {
 			const result = await editFileHandler(input);
 
 			expect(result).toEqual({
-				content: [{ type: 'text', text: 'The user has left the building' }],
+				content: [{ type: 'text', text: 'No session found' }],
 			});
 		});
 
@@ -564,7 +564,7 @@ describe('McpServerManager', () => {
 			const result = await multiEditHandler(input);
 
 			expect(result).toEqual({
-				content: [{ type: 'text', text: 'The user has left the building' }],
+				content: [{ type: 'text', text: 'No session found' }],
 			});
 		});
 

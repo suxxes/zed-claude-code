@@ -178,7 +178,7 @@ REQUIREMENTS:
 							content: [
 								{
 									type: 'text',
-									text: 'The user has left the building',
+									text: 'No session found',
 								},
 							],
 						};
@@ -245,7 +245,7 @@ REQUIREMENTS:
 						content: [
 							{
 								type: 'text',
-								text: 'The user has left the building',
+								text: 'No session found',
 							},
 						],
 					};
@@ -420,7 +420,7 @@ USAGE:
 							content: [
 								{
 									type: 'text',
-									text: 'The user has left the building',
+									text: 'No session found',
 								},
 							],
 						};
