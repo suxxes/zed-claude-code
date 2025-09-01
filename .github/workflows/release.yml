@@ -46,14 +46,21 @@ jobs:
       env:
         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-    - name: Create GitHub release (manual trigger)
+    - name: Create or update GitHub release (manual trigger)
       if: github.event_name == 'workflow_dispatch'
-      uses: softprops/action-gh-release@v2
-      with:
-        tag_name: v${{ github.event.inputs.version }}
-        name: Release v${{ github.event.inputs.version }}
-        generate_release_notes: true
-        files: |
-          dist/**/*
+      run: |
+        # Check if release exists
+        if gh release view v${{ github.event.inputs.version }} &>/dev/null; then
+          echo "Release v${{ github.event.inputs.version }} exists, updating assets..."
+          # Upload assets with --clobber to overwrite existing ones
+          gh release upload v${{ github.event.inputs.version }} dist/**/* --clobber
+        else
+          echo "Creating new release v${{ github.event.inputs.version }}..."
+          # Create new release with assets
+          gh release create v${{ github.event.inputs.version }} \
+            --title "Release v${{ github.event.inputs.version }}" \
+            --generate-notes \
+            dist/**/*
+        fi
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
