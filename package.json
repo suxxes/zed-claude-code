@@ -29,7 +29,7 @@
 		"proxy"
 	],
 	"author": "",
-	"license": "MIT",
+	"license": "Apache-2.0",
 	"dependencies": {
 		"@anthropic-ai/claude-code": "^1.0.98",
 		"@modelcontextprotocol/sdk": "^1.17.4",
