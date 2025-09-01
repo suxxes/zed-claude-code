@@ -53,14 +53,14 @@ jobs:
         if gh release view v${{ github.event.inputs.version }} &>/dev/null; then
           echo "Release v${{ github.event.inputs.version }} exists, updating assets..."
           # Upload assets with --clobber to overwrite existing ones
-          gh release upload v${{ github.event.inputs.version }} dist/**/* --clobber
+          gh release upload v${{ github.event.inputs.version }} dist/* --clobber
         else
           echo "Creating new release v${{ github.event.inputs.version }}..."
           # Create new release with assets
           gh release create v${{ github.event.inputs.version }} \
             --title "Release v${{ github.event.inputs.version }}" \
             --generate-notes \
-            dist/**/*
+            dist/*
         fi
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
