@@ -115,7 +115,7 @@ describe('McpServerManager', () => {
 		// Mock HTTP server static method
 		HttpServer.parseRequestBody = vi.fn().mockResolvedValue({ test: 'data' });
 
-		mcpServerManager = new McpServerManager(mockAgent, sessionId, clientCapabilities);
+		mcpServerManager = new McpServerManager(mockAgent, sessionId, clientCapabilities, process.cwd());
 	});
 
 	afterEach(() => {

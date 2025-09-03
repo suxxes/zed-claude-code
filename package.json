@@ -10,7 +10,7 @@
 	"scripts": {
 		"build": "node --import @swc-node/register/esm-register esbuild.config.mts",
 		"build:prod": "NODE_ENV=production npm run build",
-		"dev": "npm run build --watch",
+		"dev": "npm run build -- --watch",
 		"start": "node dist/cli.cjs",
 		"test": "vitest run",
 		"test:watch": "vitest --watch",
@@ -33,7 +33,7 @@
 	"dependencies": {
 		"@anthropic-ai/claude-code": "^1.0.98",
 		"@modelcontextprotocol/sdk": "^1.17.4",
-		"@zed-industries/agent-client-protocol": "^0.1.2",
+		"@zed-industries/agent-client-protocol": "0.2.0-alpha.5",
 		"builtin-modules": "^5.0.0",
 		"uuid": "^11.1.0",
 		"zod": "^3.25.76"

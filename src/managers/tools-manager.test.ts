@@ -12,6 +12,8 @@ import type { PlanningToolUse } from '../tools/planning-tools';
 import { PlanningToolsHandler } from '../tools/planning-tools';
 import type { SearchToolUse } from '../tools/search-tools';
 import { SearchToolsHandler } from '../tools/search-tools';
+import type { TerminalToolUse } from '../tools/terminal-tools';
+import { TerminalToolsHandler } from '../tools/terminal-tools';
 import type { WebToolUse } from '../tools/web-tools';
 import { WebToolsHandler } from '../tools/web-tools';
 import type { AnyToolUse, ClaudePlanEntry, ToolInfo, ToolResult, ToolUpdate } from './tools-manager';
@@ -30,6 +32,13 @@ vi.mock('../utils/logger', () => ({
 // Mock all tool handler classes
 vi.mock('../tools/execution-tools', () => ({
 	ExecutionToolsHandler: vi.fn().mockImplementation(() => ({
+		getToolInfo: vi.fn(),
+		getToolUpdate: vi.fn(),
+	})),
+}));
+
+vi.mock('../tools/terminal-tools', () => ({
+	TerminalToolsHandler: vi.fn().mockImplementation(() => ({
 		getToolInfo: vi.fn(),
 		getToolUpdate: vi.fn(),
 	})),
@@ -83,6 +92,7 @@ describe('ToolsManager', () => {
 	let mockFileTools: { getToolInfo: Mock; getToolUpdate: Mock };
 	let mockSearchTools: { getToolInfo: Mock; getToolUpdate: Mock };
 	let mockExecutionTools: { getToolInfo: Mock; getToolUpdate: Mock };
+	let mockTerminalTools: { getToolInfo: Mock; getToolUpdate: Mock };
 	let mockNotebookTools: { getToolInfo: Mock; getToolUpdate: Mock };
 	let mockWebTools: { getToolInfo: Mock; getToolUpdate: Mock };
 	let mockPlanningTools: { getToolInfo: Mock; getToolUpdate: Mock; convertPlanEntries: Mock };
@@ -99,6 +109,7 @@ describe('ToolsManager', () => {
 		mockFileTools = (toolsManager as any).fileTools;
 		mockSearchTools = (toolsManager as any).searchTools;
 		mockExecutionTools = (toolsManager as any).executionTools;
+		mockTerminalTools = (toolsManager as any).terminalTools;
 		mockNotebookTools = (toolsManager as any).notebookTools;
 		mockWebTools = (toolsManager as any).webTools;
 		mockPlanningTools = (toolsManager as any).planningTools;
@@ -206,7 +217,7 @@ describe('ToolsManager', () => {
 		});
 
 		it('should route execution operations to ExecutionToolsHandler', () => {
-			const executionToolNames = ['Bash', 'BashOutput', 'KillBash', 'Task'];
+			const executionToolNames = ['Task'];
 			const expectedInfo: ToolInfo = {
 				title: 'Execution operation',
 				kind: 'shell' as ToolKind,
@@ -437,19 +448,19 @@ describe('ToolsManager', () => {
 
 		it('should route execution operation results to ExecutionToolsHandler', () => {
 			const toolResult: ToolResult = {
-				content: 'Command executed',
+				content: 'Task executed',
 				tool_use_id: 'test-id',
 				is_error: false,
 			};
 
 			const toolUse: ExecutionToolUse = {
 				id: 'test-id',
-				name: 'Bash',
-				input: { command: 'ls -la' },
+				name: 'Task',
+				input: { description: 'Test task' },
 			};
 
 			const expectedUpdate: ToolUpdate = {
-				title: 'Command executed',
+				title: 'Task executed',
 				content: [],
 			};
 
@@ -797,7 +808,7 @@ describe('ToolsManager', () => {
 						content: [],
 					});
 
-					toolsManager.getToolInfoFromToolUse(toolUse, new Map());
+					toolsManager.getToolInfoFromToolUse(toolUse);
 
 					expect(mockFileTools.getToolInfo).toHaveBeenCalled();
 				}
@@ -821,7 +832,7 @@ describe('ToolsManager', () => {
 						content: [],
 					});
 
-					toolsManager.getToolInfoFromToolUse(toolUse, new Map());
+					toolsManager.getToolInfoFromToolUse(toolUse);
 
 					expect(mockSearchTools.getToolInfo).toHaveBeenCalled();
 				}
@@ -830,7 +841,7 @@ describe('ToolsManager', () => {
 
 		describe('isExecutionOperation', () => {
 			it('should correctly identify execution operations', () => {
-				const executionToolNames = ['Bash', 'BashOutput', 'KillBash', 'Task'];
+				const executionToolNames = ['Task'];
 
 				for (const toolName of executionToolNames) {
 					const toolUse: AnyToolUse = {
@@ -845,7 +856,7 @@ describe('ToolsManager', () => {
 						content: [],
 					});
 
-					toolsManager.getToolInfoFromToolUse(toolUse, new Map());
+					toolsManager.getToolInfoFromToolUse(toolUse);
 
 					expect(mockExecutionTools.getToolInfo).toHaveBeenCalled();
 				}
@@ -869,7 +880,7 @@ describe('ToolsManager', () => {
 						content: [],
 					});
 
-					toolsManager.getToolInfoFromToolUse(toolUse, new Map());
+					toolsManager.getToolInfoFromToolUse(toolUse);
 
 					expect(mockNotebookTools.getToolInfo).toHaveBeenCalled();
 				}
@@ -893,7 +904,7 @@ describe('ToolsManager', () => {
 						content: [],
 					});
 
-					toolsManager.getToolInfoFromToolUse(toolUse, new Map());
+					toolsManager.getToolInfoFromToolUse(toolUse);
 
 					expect(mockWebTools.getToolInfo).toHaveBeenCalled();
 				}
@@ -917,7 +928,7 @@ describe('ToolsManager', () => {
 						content: [],
 					});
 
-					toolsManager.getToolInfoFromToolUse(toolUse, new Map());
+					toolsManager.getToolInfoFromToolUse(toolUse);
 
 					expect(mockPlanningTools.getToolInfo).toHaveBeenCalled();
 				}
@@ -926,32 +937,6 @@ describe('ToolsManager', () => {
 	});
 
 	describe('edge cases and boundary conditions', () => {
-		it('should handle tools with similar prefixes correctly', () => {
-			// Test that tools with similar names are routed correctly
-			const toolUse1: AnyToolUse = {
-				id: 'test-id-1',
-				name: 'Bash',
-				input: {},
-			};
-
-			const toolUse2: AnyToolUse = {
-				id: 'test-id-2',
-				name: 'BashOutput',
-				input: {},
-			};
-
-			mockExecutionTools.getToolInfo.mockReturnValue({
-				title: 'Execution',
-				kind: 'shell' as ToolKind,
-				content: [],
-			});
-
-			toolsManager.getToolInfoFromToolUse(toolUse1, new Map());
-			toolsManager.getToolInfoFromToolUse(toolUse2, new Map());
-
-			expect(mockExecutionTools.getToolInfo).toHaveBeenCalledTimes(2);
-		});
-
 		it('should handle empty input objects', () => {
 			const toolUse: AnyToolUse = {
 				id: 'test-id',
@@ -997,9 +982,9 @@ describe('ToolsManager', () => {
 				input: { absPath: '/test/path1' },
 			};
 
-			const toolUse2: ExecutionToolUse = {
+			const toolUse2: TerminalToolUse = {
 				id: 'test-id-2',
-				name: 'Bash',
+				name: 'mcp__zcc__terminal_create',
 				input: { command: 'ls' },
 			};
 
@@ -1009,9 +994,9 @@ describe('ToolsManager', () => {
 				content: [],
 			});
 
-			mockExecutionTools.getToolInfo.mockReturnValue({
-				title: 'Execution operation',
-				kind: 'shell' as ToolKind,
+			mockTerminalTools.getToolInfo.mockReturnValue({
+				title: 'Terminal operation',
+				kind: 'execute' as ToolKind,
 				content: [],
 			});
 
@@ -1021,7 +1006,7 @@ describe('ToolsManager', () => {
 			]);
 
 			expect(mockFileTools.getToolInfo).toHaveBeenCalledWith(toolUse1);
-			expect(mockExecutionTools.getToolInfo).toHaveBeenCalledWith(toolUse2);
+			expect(mockTerminalTools.getToolInfo).toHaveBeenCalledWith(toolUse2);
 			expect(result1).toBeDefined();
 			expect(result2).toBeDefined();
 		});

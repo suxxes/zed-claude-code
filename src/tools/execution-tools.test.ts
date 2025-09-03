@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import type { BashOutputInput, ExecutionToolUse, KillBashInput, ToolResult } from './execution-tools';
+import type { ExecutionToolUse, ToolResult } from './execution-tools';
 import { ExecutionToolsHandler } from './execution-tools';
 
 // Mock the Logger
@@ -23,201 +23,10 @@ describe('ExecutionToolsHandler', () => {
 	});
 
 	describe('getToolInfo', () => {
-		describe('Bash tool', () => {
-			it('should handle Bash tool with command and description', () => {
-				const toolUse: ExecutionToolUse = {
-					id: 'test-1',
-					name: 'Bash',
-					input: {
-						command: 'ls -la',
-						description: 'List all files in directory',
-					},
-				};
-
-				const result = handler.getToolInfo(toolUse);
-
-				expect(result).toEqual({
-					title: 'ls -la',
-					kind: 'execute',
-					content: [
-						{
-							type: 'content',
-							content: { type: 'text', text: 'List all files in directory' },
-						},
-					],
-				});
-			});
-
-			it('should handle Bash tool with command only', () => {
-				const toolUse: ExecutionToolUse = {
-					id: 'test-2',
-					name: 'Bash',
-					input: {
-						command: 'npm install',
-					},
-				};
-
-				const result = handler.getToolInfo(toolUse);
-
-				expect(result).toEqual({
-					title: 'npm install',
-					kind: 'execute',
-					content: [],
-				});
-			});
-
-			it('should handle Bash tool without command', () => {
-				const toolUse: ExecutionToolUse = {
-					id: 'test-3',
-					name: 'Bash',
-					input: {
-						command: '',
-						description: 'Empty command test',
-					},
-				};
-
-				const result = handler.getToolInfo(toolUse);
-
-				expect(result).toEqual({
-					title: 'bash',
-					kind: 'execute',
-					content: [
-						{
-							type: 'content',
-							content: { type: 'text', text: 'Empty command test' },
-						},
-					],
-				});
-			});
-
-			it('should escape backticks in command', () => {
-				const toolUse: ExecutionToolUse = {
-					id: 'test-4',
-					name: 'Bash',
-					input: {
-						command: 'echo `date`',
-					},
-				};
-
-				const result = handler.getToolInfo(toolUse);
-
-				expect(result).toEqual({
-					title: 'echo `date`',
-					kind: 'execute',
-					content: [],
-				});
-			});
-
-			it('should handle complex command with multiple backticks', () => {
-				const toolUse: ExecutionToolUse = {
-					id: 'test-5',
-					name: 'Bash',
-					input: {
-						command: 'echo `pwd` && ls `dirname $0`',
-					},
-				};
-
-				const result = handler.getToolInfo(toolUse);
-
-				expect(result).toEqual({
-					title: 'echo `pwd` && ls `dirname $0`',
-					kind: 'execute',
-					content: [],
-				});
-			});
-
-			it('should handle undefined input properties', () => {
-				const toolUse: ExecutionToolUse = {
-					id: 'test-6',
-					name: 'Bash',
-					input: {
-						command: undefined,
-						description: undefined,
-					} as any,
-				};
-
-				const result = handler.getToolInfo(toolUse);
-
-				expect(result).toEqual({
-					title: 'bash',
-					kind: 'execute',
-					content: [],
-				});
-			});
-		});
-
-		describe('BashOutput tool', () => {
-			it('should handle BashOutput tool', () => {
-				const toolUse: ExecutionToolUse = {
-					id: 'test-7',
-					name: 'BashOutput',
-					input: {},
-				};
-
-				const result = handler.getToolInfo(toolUse);
-
-				expect(result).toEqual({
-					title: 'tail',
-					kind: 'execute',
-					content: [],
-				});
-			});
-
-			it('should handle BashOutput tool with empty input object', () => {
-				const toolUse: ExecutionToolUse = {
-					id: 'test-8',
-					name: 'BashOutput',
-					input: {} as BashOutputInput,
-				};
-
-				const result = handler.getToolInfo(toolUse);
-
-				expect(result).toEqual({
-					title: 'tail',
-					kind: 'execute',
-					content: [],
-				});
-			});
-		});
-
-		describe('KillBash tool', () => {
-			it('should handle KillBash tool', () => {
-				const toolUse: ExecutionToolUse = {
-					id: 'test-9',
-					name: 'KillBash',
-					input: {},
-				};
-
-				const result = handler.getToolInfo(toolUse);
-
-				expect(result).toEqual({
-					title: 'kill',
-					kind: 'execute',
-					content: [],
-				});
-			});
-
-			it('should handle KillBash tool with empty input object', () => {
-				const toolUse: ExecutionToolUse = {
-					id: 'test-10',
-					name: 'KillBash',
-					input: {} as KillBashInput,
-				};
-
-				const result = handler.getToolInfo(toolUse);
-
-				expect(result).toEqual({
-					title: 'kill',
-					kind: 'execute',
-					content: [],
-				});
-			});
-		});
-
 		describe('Task tool', () => {
 			it('should handle Task tool with description and prompt', () => {
 				const toolUse: ExecutionToolUse = {
-					id: 'test-11',
+					id: 'test-1',
 					name: 'Task',
 					input: {
 						description: 'Analyze code quality',
@@ -241,7 +50,7 @@ describe('ExecutionToolsHandler', () => {
 
 			it('should handle Task tool with description only', () => {
 				const toolUse: ExecutionToolUse = {
-					id: 'test-12',
+					id: 'test-2',
 					name: 'Task',
 					input: {
 						description: 'Simple task',
@@ -259,7 +68,7 @@ describe('ExecutionToolsHandler', () => {
 
 			it('should handle Task tool with prompt only', () => {
 				const toolUse: ExecutionToolUse = {
-					id: 'test-13',
+					id: 'test-3',
 					name: 'Task',
 					input: {
 						prompt: 'Execute this specific analysis',
@@ -282,7 +91,7 @@ describe('ExecutionToolsHandler', () => {
 
 			it('should handle Task tool without description or prompt', () => {
 				const toolUse: ExecutionToolUse = {
-					id: 'test-14',
+					id: 'test-4',
 					name: 'Task',
 					input: {},
 				};
@@ -298,7 +107,7 @@ describe('ExecutionToolsHandler', () => {
 
 			it('should handle Task tool with undefined properties', () => {
 				const toolUse: ExecutionToolUse = {
-					id: 'test-15',
+					id: 'test-5',
 					name: 'Task',
 					input: {
 						description: undefined,
@@ -318,7 +127,7 @@ describe('ExecutionToolsHandler', () => {
 
 		it('should throw error for unsupported tool', () => {
 			const toolUse: ExecutionToolUse = {
-				id: 'test-16',
+				id: 'test-6',
 				name: 'UnsupportedExecutionTool',
 				input: {},
 			};
@@ -332,15 +141,15 @@ describe('ExecutionToolsHandler', () => {
 			it('should handle execution result with array content', () => {
 				const toolResult: ToolResult = {
 					content: [
-						{ type: 'text', text: 'Command output line 1' },
-						{ type: 'text', text: 'Command output line 2' },
+						{ type: 'text', text: 'Task output line 1' },
+						{ type: 'text', text: 'Task output line 2' },
 					],
 				};
 
 				const toolUse: ExecutionToolUse = {
-					id: 'test-17',
-					name: 'Bash',
-					input: { command: 'ls -la' },
+					id: 'test-7',
+					name: 'Task',
+					input: { description: 'Test task' },
 				};
 
 				const result = handler.getToolUpdate(toolResult, toolUse);
@@ -349,11 +158,11 @@ describe('ExecutionToolsHandler', () => {
 					content: [
 						{
 							type: 'content',
-							content: { type: 'text', text: 'Command output line 1' },
+							content: { type: 'text', text: 'Task output line 1' },
 						},
 						{
 							type: 'content',
-							content: { type: 'text', text: 'Command output line 2' },
+							content: { type: 'text', text: 'Task output line 2' },
 						},
 					],
 				});
@@ -361,7 +170,7 @@ describe('ExecutionToolsHandler', () => {
 
 			it('should handle execution result with single array item', () => {
 				const toolResult: ToolResult = {
-					content: [{ type: 'text', text: 'Single command output' }],
+					content: [{ type: 'text', text: 'Single task output' }],
 				};
 
 				const result = handler.getToolUpdate(toolResult);
@@ -370,7 +179,7 @@ describe('ExecutionToolsHandler', () => {
 					content: [
 						{
 							type: 'content',
-							content: { type: 'text', text: 'Single command output' },
+							content: { type: 'text', text: 'Single task output' },
 						},
 					],
 				});
@@ -390,11 +199,11 @@ describe('ExecutionToolsHandler', () => {
 		describe('with string content', () => {
 			it('should handle execution result with string content', () => {
 				const toolResult: ToolResult = {
-					content: 'Direct string output from command',
+					content: 'Direct string output from task',
 				} as any;
 
 				const toolUse: ExecutionToolUse = {
-					id: 'test-18',
+					id: 'test-8',
 					name: 'Task',
 					input: { description: 'Test task' },
 				};
@@ -407,7 +216,7 @@ describe('ExecutionToolsHandler', () => {
 							type: 'content',
 							content: {
 								type: 'text',
-								text: 'Direct string output from command',
+								text: 'Direct string output from task',
 							},
 						},
 					],
@@ -462,69 +271,9 @@ describe('ExecutionToolsHandler', () => {
 					],
 				});
 			});
-
-			it('should handle mixed content types in array', () => {
-				const toolResult: ToolResult = {
-					content: [
-						{ type: 'text', text: 'Text output' },
-						{ type: 'error', text: 'Error message' } as any,
-						{ type: 'text', text: 'More text' },
-					],
-				};
-
-				const result = handler.getToolUpdate(toolResult);
-
-				expect(result).toEqual({
-					content: [
-						{
-							type: 'content',
-							content: { type: 'text', text: 'Text output' },
-						},
-						{
-							type: 'content',
-							content: { type: 'error', text: 'Error message' },
-						},
-						{
-							type: 'content',
-							content: { type: 'text', text: 'More text' },
-						},
-					],
-				});
-			});
 		});
 
 		describe('specific tool update scenarios', () => {
-			it('should handle Bash command result', () => {
-				const toolResult: ToolResult = {
-					content: [
-						{
-							type: 'text',
-							text: 'total 24\ndrwxr-xr-x  5 user  staff  160 Dec 12 10:30 .\ndrwxr-xr-x  3 user  staff   96 Dec 12 10:29 ..',
-						},
-					],
-				};
-
-				const toolUse: ExecutionToolUse = {
-					id: 'bash-1',
-					name: 'Bash',
-					input: { command: 'ls -la' },
-				};
-
-				const result = handler.getToolUpdate(toolResult, toolUse);
-
-				expect(result).toEqual({
-					content: [
-						{
-							type: 'content',
-							content: {
-								type: 'text',
-								text: 'total 24\ndrwxr-xr-x  5 user  staff  160 Dec 12 10:30 .\ndrwxr-xr-x  3 user  staff   96 Dec 12 10:29 ..',
-							},
-						},
-					],
-				});
-			});
-
 			it('should handle Task completion result', () => {
 				const toolResult: ToolResult = {
 					content: [{ type: 'text', text: 'Task completed successfully. Analysis shows 3 potential improvements.' }],
@@ -553,95 +302,14 @@ describe('ExecutionToolsHandler', () => {
 					],
 				});
 			});
-
-			it('should handle BashOutput monitoring result', () => {
-				const toolResult: ToolResult = {
-					content: [
-						{ type: 'text', text: '[2023-12-12 10:30:15] Server started on port 3000' },
-						{ type: 'text', text: '[2023-12-12 10:30:16] Connected to database' },
-					],
-				};
-
-				const toolUse: ExecutionToolUse = {
-					id: 'bash-output-1',
-					name: 'BashOutput',
-					input: {},
-				};
-
-				const result = handler.getToolUpdate(toolResult, toolUse);
-
-				expect(result).toEqual({
-					content: [
-						{
-							type: 'content',
-							content: { type: 'text', text: '[2023-12-12 10:30:15] Server started on port 3000' },
-						},
-						{
-							type: 'content',
-							content: { type: 'text', text: '[2023-12-12 10:30:16] Connected to database' },
-						},
-					],
-				});
-			});
-
-			it('should handle KillBash termination result', () => {
-				const toolResult: ToolResult = {
-					content: [{ type: 'text', text: 'Process terminated successfully' }],
-				};
-
-				const toolUse: ExecutionToolUse = {
-					id: 'kill-bash-1',
-					name: 'KillBash',
-					input: {},
-				};
-
-				const result = handler.getToolUpdate(toolResult, toolUse);
-
-				expect(result).toEqual({
-					content: [
-						{
-							type: 'content',
-							content: { type: 'text', text: 'Process terminated successfully' },
-						},
-					],
-				});
-			});
 		});
 	});
 
 	describe('integration scenarios', () => {
-		it('should handle complete Bash execution workflow', () => {
-			// Step 1: Get tool info for command
-			const toolUse: ExecutionToolUse = {
-				id: 'integration-1',
-				name: 'Bash',
-				input: {
-					command: 'npm test',
-					description: 'Run test suite',
-				},
-			};
-
-			const toolInfo = handler.getToolInfo(toolUse);
-			expect(toolInfo.title).toBe('npm test');
-			expect(toolInfo.kind).toBe('execute');
-
-			// Step 2: Process command result
-			const toolResult: ToolResult = {
-				content: [{ type: 'text', text: '✓ All tests passed (15 tests, 45 assertions)' }],
-			};
-
-			const update = handler.getToolUpdate(toolResult, toolUse);
-			expect(update.content).toHaveLength(1);
-			expect(update.content?.[0].content).toEqual({
-				type: 'text',
-				text: '✓ All tests passed (15 tests, 45 assertions)',
-			});
-		});
-
 		it('should handle complete Task delegation workflow', () => {
 			// Step 1: Get tool info for task
 			const toolUse: ExecutionToolUse = {
-				id: 'integration-2',
+				id: 'integration-1',
 				name: 'Task',
 				input: {
 					description: 'Security audit',

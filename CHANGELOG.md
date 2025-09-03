@@ -5,6 +5,24 @@ All notable changes to Zed Claude Code will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2025-09-03
+
+### Added
+- Terminal support for MCP server integration:
+  - New TerminalsManager to handle terminal lifecycle and background execution
+  - MCP terminal tools: terminal_create, terminal_output, terminal_kill
+  - TerminalToolsHandler for mapping ACP terminal operations
+  - Background terminal execution with configurable timeout handling
+  - Terminal output streaming and incremental updates
+  - Process status tracking (start, exit, abort, kill, timeout)
+- Comprehensive test coverage for terminal operations
+
+### Fixed
+- TypeScript type errors in terminal-related code
+- Linting warnings by replacing `any` types with proper interfaces
+- Uninitialized variable issues in claude-to-acp-transformer
+- TodoWrite tool result handling to prevent undefined update references
+
 ## [1.1.1] - 2025-09-01
 
 ### Refactored

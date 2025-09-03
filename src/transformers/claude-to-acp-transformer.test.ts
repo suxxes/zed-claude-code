@@ -223,7 +223,7 @@ describe('ClaudeToAcpTransformer', () => {
 			beforeEach(() => {
 				vi.mocked(mockToolsManager.getToolInfoFromToolUse).mockReturnValue({
 					title: 'Test Tool',
-					kind: 'bash',
+					kind: 'execute',
 					content: [{ type: 'text', text: 'Tool content' }],
 				});
 			});
@@ -271,7 +271,7 @@ describe('ClaudeToAcpTransformer', () => {
 						rawInput: { param: 'value' },
 						status: 'pending',
 						title: 'Test Tool',
-						kind: 'bash',
+						kind: 'execute',
 						content: [{ type: 'text', text: 'Tool content' }],
 					},
 				});
@@ -476,7 +476,7 @@ describe('ClaudeToAcpTransformer', () => {
 			it('should handle messages with multiple different chunk types', () => {
 				vi.mocked(mockToolsManager.getToolInfoFromToolUse).mockReturnValue({
 					title: 'Mixed Tool',
-					kind: 'bash',
+					kind: 'execute',
 					content: [{ type: 'text', text: 'Tool info' }],
 				});
 
