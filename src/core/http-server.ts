@@ -109,7 +109,7 @@ export class HttpServer {
 		try {
 			await route.handler(req, res);
 		} catch (error) {
-			this.logger.error(`Request handling error: ${error instanceof Error ? error.message : String(error)}`);
+			this.logger.error(`Request handling error: ${error instanceof Error ? error.message : JSON.stringify(error)}`);
 
 			if (!res.headersSent) {
 				HttpServer.sendJsonResponse(res, 500, {

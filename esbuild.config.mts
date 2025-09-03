@@ -29,7 +29,7 @@ const config: BuildOptions = {
 
 		if (isWatch) {
 			await context.watch();
-			console.log(`Watching ${config.outfile}...`);
+			console.log(`Watching ${config.entryPoints}...`);
 		} else {
 			await context.rebuild();
 			console.log(`Built ${config.outfile}`);

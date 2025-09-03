@@ -131,6 +131,14 @@ export class SessionsManager {
 				];
 			}
 
+			if (clientCapabilities?.terminal) {
+				// Disable Claude's built-in Bash tools
+				options.disallowedTools?.push('Bash', 'BashOutput', 'KillBash');
+
+				// Use our ACP-bridged terminal tools instead of Claude's built-in
+				options.allowedTools?.push('mcp__zcc__terminal_create', 'mcp__zcc__terminal_output', 'mcp__zcc__terminal_kill');
+			}
+
 			// Store session in Map for O(1) access
 			this.sessions.set(sessionId, {
 				query: query({ prompt: input, options }),
@@ -148,8 +156,9 @@ export class SessionsManager {
 				sessionId,
 			};
 		} catch (error) {
-			this.logger.error(`Session creation failed: ${error instanceof Error ? error.message : String(error)}`);
+			this.logger.error(`Session creation failed: ${error instanceof Error ? error.message : JSON.stringify(error)}`);
 			this.logger.error(`Stack: ${error instanceof Error ? error.stack : 'No stack trace'}`);
+
 			throw error;
 		}
 	}

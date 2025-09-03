@@ -21,6 +21,7 @@ import type { PlanningToolUse } from '../tools/planning-tools';
 import { PlanningToolsHandler } from '../tools/planning-tools';
 import type { SearchToolUse } from '../tools/search-tools';
 import { SearchToolsHandler } from '../tools/search-tools';
+import { TerminalToolsHandler, type TerminalToolUse } from '../tools/terminal-tools';
 import type { WebToolUse } from '../tools/web-tools';
 import { WebToolsHandler } from '../tools/web-tools';
 import { Logger } from '../utils/logger';
@@ -33,6 +34,7 @@ export type AnyToolUse =
 	| NotebookToolUse
 	| PlanningToolUse
 	| SearchToolUse
+	| TerminalToolUse
 	| WebToolUse;
 
 export interface ClaudeToolResult {
@@ -112,6 +114,7 @@ export class ToolsManager {
 	protected searchTools: SearchToolsHandler;
 	protected executionTools: ExecutionToolsHandler;
 	protected notebookTools: NotebookToolsHandler;
+	protected terminalTools: TerminalToolsHandler;
 	protected webTools: WebToolsHandler;
 	protected planningTools: PlanningToolsHandler;
 	protected genericTools: GenericToolsHandler;
@@ -125,6 +128,7 @@ export class ToolsManager {
 		this.searchTools = new SearchToolsHandler();
 		this.executionTools = new ExecutionToolsHandler();
 		this.notebookTools = new NotebookToolsHandler();
+		this.terminalTools = new TerminalToolsHandler();
 		this.webTools = new WebToolsHandler();
 		this.planningTools = new PlanningToolsHandler();
 		this.genericTools = new GenericToolsHandler();
@@ -151,6 +155,9 @@ export class ToolsManager {
 			} else if (this.isNotebookOperation(toolUse)) {
 				this.logger.debug(`Routing ${toolUse.name} to notebook tools handler`);
 				return this.notebookTools.getToolInfo(toolUse);
+			} else if (this.isTerminalOperation(toolUse)) {
+				this.logger.debug(`Routing ${toolUse.name} to terminal tools handler`);
+				return this.terminalTools.getToolInfo(toolUse);
 			} else if (this.isWebOperation(toolUse)) {
 				this.logger.debug(`Routing ${toolUse.name} to web tools handler`);
 				return this.webTools.getToolInfo(toolUse);
@@ -163,7 +170,7 @@ export class ToolsManager {
 			}
 		} catch (error) {
 			this.logger.warn(
-				`Specialized handler failed for ${toolUse.name}, falling back to generic: ${error instanceof Error ? error.message : String(error)}`,
+				`Specialized handler failed for ${toolUse.name}, falling back to generic: ${error instanceof Error ? error.message : JSON.stringify(error)}`,
 			);
 			// Fallback to generic handler if specialized handler fails
 			return this.genericTools.getToolInfo(toolUse as GenericToolUse);
@@ -195,6 +202,9 @@ export class ToolsManager {
 			} else if (this.isNotebookOperation(toolUse)) {
 				this.logger.debug(`Processing ${toolUse.name} result with notebook tools handler`);
 				return this.notebookTools.getToolUpdate(toolResult, toolUse);
+			} else if (this.isTerminalOperation(toolUse)) {
+				this.logger.debug(`Processing ${toolUse.name} result with terminal tools handler`);
+				return this.terminalTools.getToolUpdate(toolResult, toolUse);
 			} else if (this.isWebOperation(toolUse)) {
 				this.logger.debug(`Processing ${toolUse.name} result with web tools handler`);
 				return this.webTools.getToolUpdate(toolResult, toolUse);
@@ -207,7 +217,7 @@ export class ToolsManager {
 			}
 		} catch (error) {
 			this.logger.warn(
-				`Specialized handler failed for ${toolUse.name} result, falling back to generic: ${error instanceof Error ? error.message : String(error)}`,
+				`Specialized handler failed for ${toolUse.name} result, falling back to generic: ${error instanceof Error ? error.message : JSON.stringify(error)}`,
 			);
 			// Fallback to generic handler if specialized handler fails
 			return this.genericTools.getToolUpdate(toolResult, toolUse as GenericToolUse);
@@ -269,7 +279,7 @@ export class ToolsManager {
 	 * Check if tool is an execution operation
 	 */
 	protected isExecutionOperation(toolUse: AnyToolUse): toolUse is ExecutionToolUse {
-		return ['Bash', 'BashOutput', 'KillBash', 'Task'].includes(toolUse.name);
+		return ['Task'].includes(toolUse.name);
 	}
 
 	/**
@@ -277,6 +287,13 @@ export class ToolsManager {
 	 */
 	protected isNotebookOperation(toolUse: AnyToolUse): toolUse is NotebookToolUse {
 		return ['NotebookRead', 'NotebookEdit'].includes(toolUse.name);
+	}
+
+	/**
+	 * Check if tool is a terminal operation
+	 */
+	protected isTerminalOperation(toolUse: AnyToolUse): toolUse is TerminalToolUse {
+		return ['mcp__zcc__terminal_create', 'mcp__zcc__terminal_output', 'mcp__zcc__terminal_kill'].includes(toolUse.name);
 	}
 
 	/**

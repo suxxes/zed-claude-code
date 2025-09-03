@@ -1,8 +1,8 @@
 import {
 	type Agent,
+	type AgentSideConnection,
 	type AuthenticateRequest,
 	type CancelNotification,
-	type Client,
 	type ClientCapabilities,
 	type InitializeRequest,
 	type InitializeResponse,
@@ -28,7 +28,7 @@ import { Logger } from '../utils/logger';
  */
 export class AcpAgent implements Agent {
 	/** ACP client for communicating with the host application */
-	client: Client;
+	client: AgentSideConnection;
 	clientCapabilities?: ClientCapabilities;
 	/** Sessions manager for session lifecycle management */
 	protected sessionsManager: SessionsManager;
@@ -39,7 +39,7 @@ export class AcpAgent implements Agent {
 	protected claudeToAcpTransformer: ClaudeToAcpTransformer;
 	protected logger: Logger;
 
-	constructor(client: Client) {
+	constructor(client: AgentSideConnection) {
 		this.client = client;
 		this.sessionsManager = new SessionsManager();
 		this.toolsManager = new ToolsManager();
@@ -103,7 +103,7 @@ export class AcpAgent implements Agent {
 
 			return await this.sessionsManager.createSession(params, this.clientCapabilities, this);
 		} catch (error) {
-			this.logger.error(`Session creation failed: ${error instanceof Error ? error.message : String(error)}`);
+			this.logger.error(`Session creation failed: ${error instanceof Error ? error.message : JSON.stringify(error)}`);
 			this.logger.error(`Stack: ${error instanceof Error ? error.stack : 'No stack trace'}`);
 
 			throw error;
@@ -247,7 +247,7 @@ export class AcpAgent implements Agent {
 			return response;
 		} catch (error) {
 			this.logger.error(
-				`ACP writeTextFile failed for ${params.path}: ${error instanceof Error ? error.message : String(error)}`,
+				`ACP writeTextFile failed for ${params.path}: ${error instanceof Error ? error.message : JSON.stringify(error)}`,
 			);
 
 			if (error instanceof Error) {

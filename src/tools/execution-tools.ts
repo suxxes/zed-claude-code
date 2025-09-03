@@ -1,15 +1,6 @@
 import type { ClaudeToolResult, McpToolResult, ToolHandler, ToolInfo, ToolUpdate } from '../managers/tools-manager';
 
 // Execution operation types
-export interface BashInput {
-	command: string;
-	description?: string;
-}
-
-export type BashOutputInput = Record<string, never>;
-
-export type KillBashInput = Record<string, never>;
-
 export interface TaskInput {
 	description?: string;
 	prompt?: string;
@@ -25,11 +16,11 @@ export interface ToolResult {
 export type ExecutionToolUse = {
 	id: string;
 	name: string;
-	input: BashInput | BashOutputInput | KillBashInput | TaskInput;
+	input: TaskInput;
 };
 
 /**
- * Execution operations tool handler - handles Bash, Task, and other execution tools
+ * Execution operations tool handler - handles Task and other execution tools
  */
 export class ExecutionToolsHandler implements ToolHandler {
 	getToolInfo(toolUse: ExecutionToolUse): ToolInfo {
@@ -37,15 +28,6 @@ export class ExecutionToolsHandler implements ToolHandler {
 		const input = toolUse.input;
 
 		switch (name) {
-			case 'Bash':
-				return this.handleBashTool(input as BashInput);
-
-			case 'BashOutput':
-				return this.handleBashOutputTool(input as BashOutputInput);
-
-			case 'KillBash':
-				return this.handleKillBashTool(input as KillBashInput);
-
 			case 'Task':
 				return this.handleTaskTool(input as TaskInput);
 
@@ -78,46 +60,6 @@ export class ExecutionToolsHandler implements ToolHandler {
 		}
 
 		return {};
-	}
-
-	/**
-	 * Handle Bash command execution
-	 */
-	protected handleBashTool(input: BashInput): ToolInfo {
-		return {
-			title: input?.command ? input.command : 'bash',
-			kind: 'execute',
-			content: input?.description
-				? [
-						{
-							type: 'content',
-							content: { type: 'text', text: input.description },
-						},
-					]
-				: [],
-		};
-	}
-
-	/**
-	 * Handle Bash output monitoring
-	 */
-	protected handleBashOutputTool(_input: BashOutputInput): ToolInfo {
-		return {
-			title: 'tail',
-			kind: 'execute',
-			content: [],
-		};
-	}
-
-	/**
-	 * Handle Bash process termination
-	 */
-	protected handleKillBashTool(_input: KillBashInput): ToolInfo {
-		return {
-			title: 'kill',
-			kind: 'execute',
-			content: [],
-		};
 	}
 
 	/**

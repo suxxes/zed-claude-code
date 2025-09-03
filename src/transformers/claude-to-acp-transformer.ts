@@ -121,6 +121,11 @@ export class ClaudeToAcpTransformer
 
 					this.logger.info(`Cached tool use: ${cachedToolUse ? cachedToolUse.name : 'not found'}`);
 
+					// Skip TodoWrite tool results - they don't generate updates
+					if (cachedToolUse?.name === 'TodoWrite') {
+						continue;
+					}
+
 					const toolUpdate = toolsManager.getToolUpdateFromResult(chunk, cachedToolUse);
 
 					this.logger.info(`Tool update result: ${JSON.stringify(toolUpdate)}`);

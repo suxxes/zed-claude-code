@@ -7,6 +7,7 @@ import { z } from 'zod';
 import type { AcpAgent } from '../core/acp-agent';
 import { HttpServer } from '../core/http-server';
 import { Logger } from '../utils/logger';
+import { TerminalsManager } from './terminals-manager';
 
 // MCP-specific types (snake_case for MCP schema compatibility)
 export interface McpReadFileInput {
@@ -37,6 +38,16 @@ export interface PermissionInput {
 	tool_use_id?: string;
 }
 
+export interface McpTerminalInput {
+	command: string;
+	timeout: number;
+	background: boolean;
+}
+
+export interface McpTerminalIdInput {
+	terminalId: string;
+}
+
 export interface ToolResult {
 	content: Array<{
 		type: 'text';
@@ -51,22 +62,16 @@ export class McpServerManager {
 	protected mcpServer: McpServer;
 	protected httpServer: HttpServer;
 	protected logger: Logger;
-	protected agent: AcpAgent;
-	protected sessionId: string;
-	protected clientCapabilities?: ClientCapabilities;
-	protected workingDirectory: string;
+	protected terminalsManager: TerminalsManager;
 
 	constructor(
-		agent: AcpAgent,
-		sessionId: string,
-		clientCapabilities: ClientCapabilities | undefined,
-		workingDirectory?: string,
+		protected agent: AcpAgent,
+		protected sessionId: string,
+		protected clientCapabilities: ClientCapabilities | undefined,
+		protected workingDirectory: string,
 	) {
-		this.agent = agent;
-		this.sessionId = sessionId;
-		this.clientCapabilities = clientCapabilities;
-		this.workingDirectory = workingDirectory || process.cwd();
 		this.logger = new Logger({ component: 'MCP Server Manager' });
+		this.terminalsManager = new TerminalsManager(agent, sessionId, workingDirectory);
 
 		this.mcpServer = new McpServer({
 			name: 'zcc-mcp-server',
@@ -108,7 +113,7 @@ export class McpServerManager {
 			await this.mcpServer.connect(transport);
 			await transport.handleRequest(req, res, body);
 		} catch (error) {
-			this.logger.error(`MCP request error: ${error instanceof Error ? error.message : String(error)}`);
+			this.logger.error(`MCP request error: ${error instanceof Error ? error.message : JSON.stringify(error)}`);
 			throw error;
 		}
 	}
@@ -124,6 +129,10 @@ export class McpServerManager {
 		if (this.clientCapabilities?.fs?.writeTextFile) {
 			this.registerEditTool(); // Handles both write and edit operations
 			this.registerMultiEditTool();
+		}
+
+		if (this.clientCapabilities?.terminal) {
+			this.registerTerminalTools();
 		}
 
 		this.registerPermissionTool();
@@ -168,7 +177,7 @@ REQUIREMENTS:
 				try {
 					this.logger.debug(`MCP read_file called with input: ${JSON.stringify(input)}`);
 
-					// Check if session exists in Map
+					// Check if session exists
 					const session = this.agent.getSessionsManager().getSession(this.sessionId);
 
 					if (!session) {
@@ -237,7 +246,7 @@ REQUIREMENTS:
 			try {
 				this.logger.debug(`MCP edit/write tool called with input: ${JSON.stringify(input)}`);
 
-				// Check if session exists in Map
+				// Check if session exists
 				const session = this.agent.getSessionsManager().getSession(this.sessionId);
 
 				if (!session) {
@@ -410,7 +419,7 @@ USAGE:
 				try {
 					this.logger.debug(`MCP multi_edit called with input: ${JSON.stringify(input)}`);
 
-					// Check if session exists in Map
+					// Check if session exists
 					const session = this.agent.getSessionsManager().getSession(this.sessionId);
 
 					if (!session) {
@@ -463,13 +472,171 @@ USAGE:
 						],
 					};
 				} catch (error: unknown) {
-					this.logger.error(`MCP multi_edit error: ${error instanceof Error ? error.message : String(error)}`);
+					this.logger.error(`MCP multi_edit error: ${error instanceof Error ? error.message : JSON.stringify(error)}`);
 
 					return {
 						content: [
 							{
 								type: 'text',
-								text: `Multi-edit failed: ${error instanceof Error ? error.message : String(error)}`,
+								text: `Multi-edit failed: ${error instanceof Error ? error.message : JSON.stringify(error)}`,
+							},
+						],
+					};
+				}
+			},
+		);
+	}
+
+	/**
+	 * Register terminal tools
+	 */
+	protected registerTerminalTools(): void {
+		// Register the terminal_create tool (main terminal execution)
+		this.logger.debug('Registering MCP terminal_create tool');
+		this.mcpServer.registerTool(
+			'terminal_create',
+			{
+				title: 'Terminal',
+				description:
+					'Creates a new terminal session and executes a shell command with optional timeout and background execution support',
+				inputSchema: {
+					command: z.string().describe('Shell command to execute'),
+					timeout: z
+						.number()
+						.default(60 * 1000)
+						.describe('Timeout in milliseconds (default: 60000, max: 600000)'),
+					background: z.boolean().default(false).describe('Whether to run the command in the background'),
+				},
+			},
+			async (input: McpTerminalInput, extra): Promise<ToolResult> => {
+				try {
+					// Check if session exists
+					const session = this.agent.getSessionsManager().getSession(this.sessionId);
+
+					if (!session) {
+						this.logger.warn(`MCP terminal_create: Session ${this.sessionId} not found`);
+
+						return {
+							content: [
+								{
+									type: 'text',
+									text: 'Session not found',
+								},
+							],
+						};
+					}
+
+					this.logger.debug(`MCP terminal_create called with input: ${JSON.stringify(input)}`);
+
+					return await this.terminalsManager.createTerminal(input, extra);
+				} catch (error: unknown) {
+					this.logger.error(
+						`MCP terminal_create error: ${error instanceof Error ? error.message : JSON.stringify(error)}`,
+					);
+
+					return {
+						content: [
+							{
+								type: 'text',
+								text: `Command execution failed: ${error instanceof Error ? error.message : JSON.stringify(error)}`,
+							},
+						],
+					};
+				}
+			},
+		);
+
+		// Register terminal_output tool
+		this.logger.debug('Registering MCP terminal_output tool');
+		this.mcpServer.registerTool(
+			'terminal_output',
+			{
+				title: 'Terminal Output',
+				description: 'Retrieves the output from a running terminal',
+				inputSchema: {
+					terminalId: z.string().describe('Terminal ID returned from terminal_create tool'),
+				},
+			},
+			async (input: McpTerminalIdInput): Promise<ToolResult> => {
+				try {
+					// Check if session exists
+					const session = this.agent.getSessionsManager().getSession(this.sessionId);
+
+					if (!session) {
+						this.logger.warn(`MCP terminal_output: Session ${this.sessionId} not found`);
+
+						return {
+							content: [
+								{
+									type: 'text',
+									text: 'Session not found',
+								},
+							],
+						};
+					}
+
+					this.logger.debug(`MCP terminal_output called with input: ${JSON.stringify(input)}`);
+
+					return await this.terminalsManager.getTerminalOutput(input);
+				} catch (error: unknown) {
+					this.logger.error(
+						`MCP terminal_output error: ${error instanceof Error ? error.message : JSON.stringify(error)}`,
+					);
+
+					return {
+						content: [
+							{
+								type: 'text',
+								text: `Failed to get terminal output: ${error instanceof Error ? error.message : JSON.stringify(error)}`,
+							},
+						],
+					};
+				}
+			},
+		);
+
+		// Register terminal_kill tool
+		this.logger.debug('Registering MCP terminal_kill tool');
+		this.mcpServer.registerTool(
+			'terminal_kill',
+			{
+				title: 'Terminal Kill',
+				description: 'Terminates a running terminal session',
+				inputSchema: {
+					terminalId: z.string().describe('Terminal ID returned from terminal_create tool'),
+				},
+			},
+			async (input: McpTerminalIdInput): Promise<ToolResult> => {
+				try {
+					// Check if session exists
+					const session = this.agent.getSessionsManager().getSession(this.sessionId);
+
+					if (!session) {
+						this.logger.warn(`MCP terminal_kill: Session ${this.sessionId} not found`);
+
+						return {
+							content: [
+								{
+									type: 'text',
+									text: 'Session not found',
+								},
+							],
+						};
+					}
+
+					this.logger.debug(`MCP terminal_kill called with input: ${JSON.stringify(input)}`);
+
+					return await this.terminalsManager.killTerminal(input);
+				} catch (error: unknown) {
+					this.logger.error(
+						`MCP terminal_kill error: ${error instanceof Error ? error.message : JSON.stringify(error)}`,
+					);
+
+					return {
+						content: [
+							{
+								type: 'text',
+								text: `Failed to kill terminal: ${error instanceof Error ? error.message : JSON.stringify(error)}`,
 							},
 						],
 					};
@@ -500,7 +667,7 @@ USAGE:
 			async (input: PermissionInput): Promise<ToolResult> => {
 				this.logger.debug(`MCP permission_request called for tool: ${input.tool_name}`);
 
-				// Check if session exists in Map
+				// Check if session exists
 				const session = this.agent.getSessionsManager().getSession(this.sessionId);
 
 				if (!session) {
