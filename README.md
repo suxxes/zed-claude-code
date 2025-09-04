@@ -1,3 +1,5 @@
+[![MseeP.ai Security Assessment Badge](https://mseep.net/pr/suxxes-zed-claude-code-badge.png)](https://mseep.ai/app/suxxes-zed-claude-code)
+
 # Zed Claude Code
 
 [![Tests](https://github.com/suxxes/zed-claude-code/actions/workflows/test.yml/badge.svg)](https://github.com/suxxes/zed-claude-code/actions/workflows/test.yml)
